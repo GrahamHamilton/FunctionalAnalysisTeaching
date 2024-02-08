@@ -1,0 +1,628 @@
+---
+title: "Functional Analysis"
+author: "Graham Hamilton"
+format:
+  revealjs:
+    slide-number: c/t
+    show-slide-number: all
+editor: source
+---
+
+## Overview
+
+::: columns
+::: {.column width="50%"}
+-   Loading packages
+-   Loading results from DESeq2
+-   Annotation
+-   Filtering results by fold change and adjusted p value
+:::
+
+::: {.column width="50%"}
+-   Gene ontology analysis
+-   Pathway enrichment
+-   Cell marker gene set enrichment
+-   Visualisation
+:::
+:::
+
+## Ingenuity Pathway Analysis
+
+Qiagen Ingenuity Pathway Analysis
+
+-   Canonical pathways
+-   Upstream analysis
+-   Diseases & functions
+-   Regulator effects
+-   **Expensive annual licence**
+
+## DAVID
+
+-   Web server
+-   Functional enrichment analysis
+-   Functional annotation
+-   **Free to use**
+
+::: aside
+::: {style="font-size: 50%;"}
+Brad T Sherman, Ming Hao, Ju Qiu, Xiaoli Jiao, Michael W Baseler, H Clifford Lane, Tomozumi Imamichi, Weizhong Chang, DAVID: a web server for functional enrichment analysis and functional annotation of gene lists (2021 update), Nucleic Acids Research, Volume 50, Issue W1, 5 July 2022, Pages W216--W221, https://doi.org/10.1093/nar/gkac194
+:::
+:::
+
+## ClusterProfiler {.smaller}
+
+ClusterProfiler is an R package that performs functional enrichment analysis, to aide interpretation of high throughput data like RNASeq.
+
+-   Over representation analysis
+    -   Identify pathways or ontologies annotated be the gene set greater than expected by chance, ORA
+-   Gene set enrichment analysis, GSEA
+    -   Similar to ORA but with differing statistical approach
+-   **Free to use**
+
+::: aside
+::: {style="font-size: 75%;"}
+https://yulab-smu.top/biomedical-knowledge-mining-book/index.html <br><br> Wu T, Hu E, Xu S, Chen M, Guo P, Dai Z, et al. clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. Innovation (Camb). 2021;2(3):100141., https://doi.org/10.1016/j.xinn.2021.100141
+:::
+:::
+
+## CRAN packages
+
+Install CRAN packages
+
+```{r}
+#| echo: true
+#| eval: true
+#| output: false
+cran.packages <- c("tidyverse",
+                   "ggrepel",
+                   "kableExtra",
+                   "ggupset")
+
+cran.load <- function(pkg){
+        new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+        if (length(new.pkg)){
+          install.packages(new.pkg, dependencies = TRUE)
+          }
+        sapply(pkg, require, character.only = TRUE)
+}
+cran.load(cran.packages)
+```
+
+## Bioconductor Packages
+
+Install Biocondustor packages
+
+```{r}
+#| echo: true
+#| eval: true
+#| output: false
+bioconductor.packages <- c("org.Hs.eg.db",
+                           "biomaRt",
+                           "clusterProfiler",
+                           "enrichplot",
+                           "pathview")
+
+bioconductor.load <- function(pkg){
+        new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+        if (length(new.pkg)){
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+            install.packages("BiocManager")
+            BiocManager::install(new.pkg)
+        }
+        sapply(pkg, require, character.only = TRUE)
+}
+bioconductor.load(bioconductor.packages)
+```
+
+## Statistical cut off values
+
+Create the cut off used for filtering results
+
+```{r}
+#| echo: true
+#| eval: true
+pvalueCutoff <- 0.05 # P value
+qvalueCutoff <- 0.1 # Adjusted P value
+foldchange <- 1 # Fold change, usually fold change is log2
+```
+
+## Load Previous Session Results {.smaller}
+
+Read in the results file from Session 4
+
+```{r}
+#| echo: true
+#| eval: true
+de_results <- read_delim("./data/Treatment_vs_Control_results.tsv", 
+                         delim = "\t")
+
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+de_results %>%
+  head(n=3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Results Directory
+
+Create a results directory for the ClusterProfiler results files
+
+```{r}
+#| echo: true
+#| eval: true
+results_directory <- "ClusterProfiler"
+dir.create(results_directory, showWarnings = FALSE)
+```
+
+## Filter {.smaller}
+
+Filter the results table for genes that have a p adjusted value of 0.1 and a log fold change of 1.
+
+**NOTE:** The use of the absolute value for the log2 fold change.
+
+```{r}
+#| echo: true
+#| eval: true
+filtered_de_results <- de_results %>%
+  filter(padj < qvalueCutoff,
+         abs(log2FoldChange) > foldchange) %>%
+  drop_na()
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+filtered_de_results %>%
+  head(n=3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+There are **`r nrow(filtered_de_results)`** genes remaining after filtering.
+
+## Gene Ontology {.smaller}
+
+::: {style="font-size: 75%;"}
+-   Ontology is a formal representation of knowledgebase for the functions of genes, computer and human readable
+-   GO split into three domains
+    -   Molecular Function
+        -   Molecular-level activities performed by gene products e.g. catalysis or transport
+    -   Cellular Component
+        -   Location relative to cellular structure of gene function e.g. mitochondrian or ribosome
+    -   Biological Process
+        -   Larger processes accomplished by multiple molecular activities e.g DNA repair or signal transduction
+-   **GO does not describe pathways**
+:::
+
+## Over Representation Analysis {.smaller}
+
+::: {style="font-size: 75%;"}
+-   Widely used approach to determine whether known biological functions or processes are over-represented in a set of differentially expressed genes
+
+Example - 57 genes were differentially expressed out of a total of 17,980. Among the differentially expressed genes, 28 are annotated to a gene set
+
+```{r}
+#| echo: false
+#| eval: true
+d <- data.frame(gene.not.interest=c(2613, 15310), gene.in.interest=c(28, 29))
+row.names(d) <- c("In_category", "not_in_category")
+
+d %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+
+```{r}
+#| echo: false
+#| eval: true
+f_test <- fisher.test(d)
+```
+
+Test significance using hypergeometric distribution, one-sided Fisher's exact test. The un-corrected P value **`r format(f_test$p.value, scientific = TRUE)`**
+:::
+
+::: aside
+::: {style="font-size: 75%;"}
+Boyle, Elizabeth I, Shuai Weng, Jeremy Gollub, Heng Jin, David Botstein, J Michael Cherry, and Gavin Sherlock. 2004. "GO::TermFinder--open Source Software for Accessing Gene Ontology Information and Finding Significantly Enriched Gene Ontology Terms Associated with a List of Genes." Bioinformatics (Oxford, England) 20 (18): 3710--15. https://doi.org/10.1093/bioinformatics/bth456.
+:::
+:::
+
+## Gene Set Enrichment Analysis {.smaller}
+
+-   Over representation analysis find genes where the difference is large but will fail where the difference is small.
+-   Gene Set Enrichment Analysis (GSEA) directly addresses this limitation.
+    1.  Calculate Enrichment Score (ES)
+    2.  Estimation of Significance Level of ES
+    3.  Adjustment for Multiple Hypothesis Testing
+
+::: aside
+::: {style="font-size: 75%;"}
+Subramanian, Aravind, Pablo Tamayo, Vamsi K. Mootha, Sayan Mukherjee, Benjamin L. Ebert, Michael A. Gillette, Amanda Paulovich, et al. 2005. "Gene Set Enrichment Analysis: A Knowledge-Based Approach for Interpreting Genome-Wide Expression Profiles." Proceedings of the National Academy of Sciences of the United States of America 102 (43): 15545--50. https://doi.org/10.1073/pnas.0506580102.
+:::
+:::
+
+## Gene Ontology Analysis
+
+Over representation analysis
+
+List of entrez ids for the differentially expressed genes, using the **pull()** command from dplyr
+
+```{r}
+#| echo: true
+#| eval: true
+de_genes <- filtered_de_results %>%
+  pull(entrezgene_id)
+```
+
+<br>
+
+```{r}
+#| echo: false
+#| eval: true
+head(de_genes)
+```
+
+## Gene Ontology Analysis {.smaller}
+
+Over representation analysis
+
+```{r}
+#| echo: true
+#| eval: true
+go_ora <- enrichGO(gene = de_genes,
+                   OrgDb = org.Hs.eg.db,
+                   ont = "CC", # Can choose "BP","CC", "MF" or "ALL"
+                   pAdjustMethod = "BH", # Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+                   pvalueCutoff = 0.01,
+                   qvalueCutoff = 0.05,
+                   readable = TRUE)
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+go_ora %>%
+  head(n = 3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Gene Ontology Analysis {.smaller}
+
+Gene set enrichment analysis
+
+Input is a named vector of log fold changes with entrez ids as the names, sorted
+
+```{r}
+#| echo: true
+#| eval: true
+gsea_gene_list <- filtered_de_results$log2FoldChange
+names(gsea_gene_list) <- filtered_de_results$entrezgene_id
+gsea_gene_list <- sort(gsea_gene_list, decreasing = TRUE)
+```
+
+<br>
+
+```{r}
+#| echo: false
+#| eval: true
+gsea_gene_list %>%
+  head(n = 6)
+```
+
+## Gene Ontology Analysis {.smaller}
+
+Gene set enrichment analysis
+
+```{r}
+#| echo: true
+#| eval: true
+go_gsea <- gseGO(gene = gsea_gene_list,
+                 OrgDb = org.Hs.eg.db,
+                 ont = "CC", # Can choose BP,CC, MF or ALL
+                 pAdjustMethod = "BH", # Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+                 minGSSize    = 100,
+                 maxGSSize    = 500,
+                 pvalueCutoff = 0.01)
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+go_gsea %>%
+  head(n = 3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Gene Ontology Analysis {.smaller}
+
+Saving the results to a file
+
+ORA GO analysis
+
+```{r}
+#| echo: true
+#| eval: true
+write_delim(as.data.frame(go_ora), 
+            file = file.path(results_directory, "go_ora_enriched.tsv"), 
+            delim = "\t")
+```
+
+GSEA GO analysis
+
+```{r}
+#| echo: true
+#| eval: true
+write_delim(as.data.frame(go_gsea), 
+            file = file.path(results_directory, "go_gsea_enriched.tsv"), 
+            delim = "\t")
+```
+
+## Gene Ontology Analysis {.smaller}
+
+Various options for visualising the results
+
+::: columns
+::: {.column width="50%"}
+-   Barplot
+-   Dotplot
+-   Heatmap
+-   Cnetplot
+:::
+
+::: {.column width="50%"}
+<br>
+
+```{r}
+#| echo: true
+#| eval: true
+barplot(go_ora, showCategory=10)
+```
+:::
+:::
+
+::: aside
+::: {style="font-size: 75%;"}
+https://yulab-smu.top/biomedical-knowledge-mining-book/index.html
+:::
+:::
+
+## Pathway Analysis {.smaller}
+
+Pathway analysis uses over representation and gene set enrichment analysis.\
+Can use several databases for pathway analysis:
+
+-   KEGG
+-   WikiPathways
+-   Reactome
+
+## Pathway Analysis {.smaller}
+
+### WikiPathways
+
+Continuously updated pathway database curated by a community of researchers.\
+Supported organisms:
+
+<br>
+
+```{r}
+#| echo: false
+#| eval: true
+get_wp_organisms()
+```
+
+::: aside
+::: {style="font-size: 75%;"}
+https://www.wikipathways.org
+:::
+:::
+
+## Pathway Analysis {.smaller}
+
+### Reactome
+
+Reactome is an open-source, open access, manually curated and peer-reviewed pathway database. Only implements over representation analysis.\
+Supported organisms:
+
+<br>
+
+```{r}
+#| echo: false
+#| eval: true
+c( "celegans","fly","human","mouse","rat","yeast","zebrafish")
+```
+
+::: aside
+::: {style="font-size: 75%;"}
+G Yu, QY He\*. ReactomePA: an R/Bioconductor package for reactome pathway analysis and visualization. Molecular BioSystems 2016, 12(2):477-479. doi: 10.1039/C5MB00663E
+:::
+:::
+
+## Pathway Analysis {.smaller}
+
+### KEGG
+
+Kyoto Encyclopedia of Genes and Genomes.
+
+Implements ORA and GSEA
+
+```{r}
+#| echo: false
+#| eval: true
+orgs <- search_kegg_organism("", by='kegg_code')
+```
+
+Supports a large number of organisms **`r nrow(orgs)`**.
+
+Search using search_kegg_organism() command:
+
+::: {style="font-size: 75%;"}
+```{r}
+#| echo: true
+#| eval: true
+search_kegg_organism("Mus musculus", by='scientific_name') %>% # Can also search using kegg_code or common_name
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+::: aside
+::: {style="font-size: 75%;"}
+Full list can be found here: http://www.genome.jp/kegg/catalog/org_list.html
+:::
+:::
+
+## Pathway Analysis {.smaller}
+
+Over representation analysis
+
+-   Use de genes from the GO over representation analysis
+
+```{r}
+#| echo: true
+#| eval: true
+kegg_ora <- enrichKEGG(gene = de_genes,
+                       organism = 'hsa',
+                       pvalueCutoff = 0.01)
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+kegg_ora %>%
+  head(n = 3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Pathway Analysis {.smaller}
+
+Gene set enrichment analysis.
+
+-   Use de genes list from the GO gene set enrichment analysis
+
+```{r}
+#| echo: true
+#| eval: true
+kegg_gsea <- gseKEGG(geneList = gsea_gene_list,
+                     organism = 'hsa',
+                     minGSSize = 10,
+                     pvalueCutoff = 0.05)
+```
+
+<br>
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+kegg_gsea %>%
+  head(n = 3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Pathway Analysis {.smaller}
+
+Save the pathway analysis to file
+
+Over representation analysis
+
+```{r}
+#| echo: true
+#| eval: true
+kegg_ora %>%
+  as.data.frame() %>%
+  write_delim(file = file.path(results_directory, "ora_pathway.tsv"),
+              delim = "\t")
+```
+
+Gene set enrichment analysis
+
+```{r}
+#| echo: true
+#| eval: true
+kegg_gsea %>%
+  as.data.frame() %>%
+  write_delim(file = file.path(results_directory, "gsea_pathway.tsv"),
+              delim = "\t")
+```
+
+## Pathway Analysis Visualisation {.smaller}
+
+Pathview is a tool set for pathway based data integration and visualization
+
+-   Input Kegg pathway id
+-   List of differentially expressed genes
+    -   names - entrez ids
+    -   values - log fold changes
+
+::: aside
+::: {style="font-size: 75%;"}
+Luo, Weijun, and Cory Brouwer. 2013. "Pathview: An R/Bioconductor Package for Pathway-Based Data Integration and Visualization." Bioinformatics 29 (July): 1830--31. https://doi.org/10.1093/bioinformatics/btt285.
+:::
+:::
+
+## Pathway Analysis Visualisation {.smaller}
+
+Create a function to retrieve the KEG pathways
+
+```{r}
+#| echo: true
+#| eval: true
+#| output: false
+kegg_pathview <- function(kegg_pathway_id){
+  pathview(gene.data = gsea_gene_list, # List of DE gene entrez ids and log fold changes
+        pathway.id = kegg_pathway_id, # KEGG pathway id to download and annotate
+        species = "hsa", # Organism KEGG id
+        gene.idtype = "KEGG", 
+        kegg.native = TRUE)
+}
+
+kegg_gsea_list <- kegg_gsea %>%
+  as.data.frame() %>%
+  pull(ID) 
+lapply(kegg_gsea_list, kegg_pathview)
+```
+
+Tidy up the pathway files
+
+```{r}
+#| echo: true
+#| eval: true
+results.files <- list.files(path = ".", pattern = "pathview.png") %>% # list all pathview files
+  file.copy(results_directory) # Copy pathway files to results directory
+# Delete results files
+remove_files <- list.files(path = ".", pattern = "hsa") %>% # List all files dowloaded from KEGG
+  file.remove() # Delete the files
+```
+
+## Pathway Analysis Visualisation {.smaller}
+
+![](ClusterProfiler/hsa05202.pathview.png){width="100%"}

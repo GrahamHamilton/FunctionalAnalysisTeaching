@@ -1,0 +1,1789 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<script src="ClusterProfiler_files/libs/clipboard/clipboard.min.js"></script>
+<script src="ClusterProfiler_files/libs/quarto-html/tabby.min.js"></script>
+<script src="ClusterProfiler_files/libs/quarto-html/popper.min.js"></script>
+<script src="ClusterProfiler_files/libs/quarto-html/tippy.umd.min.js"></script>
+<link href="ClusterProfiler_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="ClusterProfiler_files/libs/quarto-html/quarto-html.min.css" rel="stylesheet" data-mode="light">
+<link href="ClusterProfiler_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles"><meta charset="utf-8">
+  <meta name="generator" content="quarto-1.2.269">
+
+  <meta name="author" content="Graham Hamilton">
+  <title>Session 5: ClusterProfiler</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="ClusterProfiler_files/libs/revealjs/dist/reset.css">
+  <link rel="stylesheet" href="ClusterProfiler_files/libs/revealjs/dist/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    div.columns{display: flex; gap: min(4vw, 1.5em);}
+    div.column{flex: auto; overflow-x: auto;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+    ul.task-list li input[type="checkbox"] {
+      width: 0.8em;
+      margin: 0 0.8em 0.2em -1.6em;
+      vertical-align: middle;
+    }
+    pre > code.sourceCode { white-space: pre; position: relative; }
+    pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+    pre > code.sourceCode > span:empty { height: 1.2em; }
+    .sourceCode { overflow: visible; }
+    code.sourceCode > span { color: inherit; text-decoration: inherit; }
+    div.sourceCode { margin: 1em 0; }
+    pre.sourceCode { margin: 0; }
+    @media screen {
+    div.sourceCode { overflow: auto; }
+    }
+    @media print {
+    pre > code.sourceCode { white-space: pre-wrap; }
+    pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+    }
+    pre.numberSource code
+      { counter-reset: source-line 0; }
+    pre.numberSource code > span
+      { position: relative; left: -4em; counter-increment: source-line; }
+    pre.numberSource code > span > a:first-child::before
+      { content: counter(source-line);
+        position: relative; left: -1em; text-align: right; vertical-align: baseline;
+        border: none; display: inline-block;
+        -webkit-touch-callout: none; -webkit-user-select: none;
+        -khtml-user-select: none; -moz-user-select: none;
+        -ms-user-select: none; user-select: none;
+        padding: 0 4px; width: 4em;
+        color: #aaaaaa;
+      }
+    pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+    div.sourceCode
+      { color: #003b4f; background-color: #f1f3f5; }
+    @media screen {
+    pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+    }
+    code span { color: #003b4f; } /* Normal */
+    code span.al { color: #ad0000; } /* Alert */
+    code span.an { color: #5e5e5e; } /* Annotation */
+    code span.at { color: #657422; } /* Attribute */
+    code span.bn { color: #ad0000; } /* BaseN */
+    code span.bu { } /* BuiltIn */
+    code span.cf { color: #003b4f; } /* ControlFlow */
+    code span.ch { color: #20794d; } /* Char */
+    code span.cn { color: #8f5902; } /* Constant */
+    code span.co { color: #5e5e5e; } /* Comment */
+    code span.cv { color: #5e5e5e; font-style: italic; } /* CommentVar */
+    code span.do { color: #5e5e5e; font-style: italic; } /* Documentation */
+    code span.dt { color: #ad0000; } /* DataType */
+    code span.dv { color: #ad0000; } /* DecVal */
+    code span.er { color: #ad0000; } /* Error */
+    code span.ex { } /* Extension */
+    code span.fl { color: #ad0000; } /* Float */
+    code span.fu { color: #4758ab; } /* Function */
+    code span.im { color: #00769e; } /* Import */
+    code span.in { color: #5e5e5e; } /* Information */
+    code span.kw { color: #003b4f; } /* Keyword */
+    code span.op { color: #5e5e5e; } /* Operator */
+    code span.ot { color: #003b4f; } /* Other */
+    code span.pp { color: #ad0000; } /* Preprocessor */
+    code span.sc { color: #5e5e5e; } /* SpecialChar */
+    code span.ss { color: #20794d; } /* SpecialString */
+    code span.st { color: #20794d; } /* String */
+    code span.va { color: #111111; } /* Variable */
+    code span.vs { color: #20794d; } /* VerbatimString */
+    code span.wa { color: #5e5e5e; font-style: italic; } /* Warning */
+  </style>
+  <link rel="stylesheet" href="ClusterProfiler_files/libs/revealjs/dist/theme/quarto.css" id="theme">
+  <link href="ClusterProfiler_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
+  <link href="ClusterProfiler_files/libs/revealjs/plugin/reveal-menu/menu.css" rel="stylesheet">
+  <link href="ClusterProfiler_files/libs/revealjs/plugin/reveal-menu/quarto-menu.css" rel="stylesheet">
+  <link href="ClusterProfiler_files/libs/revealjs/plugin/quarto-support/footer.css" rel="stylesheet">
+  <style type="text/css">
+
+  .callout {
+    margin-top: 1em;
+    margin-bottom: 1em;  
+    border-radius: .25rem;
+  }
+
+  .callout.callout-style-simple { 
+    padding: 0em 0.5em;
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+    display: flex;
+  }
+
+  .callout.callout-style-default {
+    border-left: solid #acacac .3rem;
+    border-right: solid 1px silver;
+    border-top: solid 1px silver;
+    border-bottom: solid 1px silver;
+  }
+
+  .callout .callout-body-container {
+    flex-grow: 1;
+  }
+
+  .callout.callout-style-simple .callout-body {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-style-default .callout-body {
+    font-size: 0.9rem;
+    font-weight: 400;
+  }
+
+  .callout.callout-captioned.callout-style-simple .callout-body {
+    margin-top: 0.2em;
+  }
+
+  .callout:not(.callout-captioned) .callout-body {
+      display: flex;
+  }
+
+  .callout:not(.no-icon).callout-captioned.callout-style-simple .callout-content {
+    padding-left: 1.6em;
+  }
+
+  .callout.callout-captioned .callout-header {
+    padding-top: 0.2em;
+    margin-bottom: -0.2em;
+  }
+
+  .callout.callout-captioned .callout-caption  p {
+    margin-top: 0.5em;
+    margin-bottom: 0.5em;
+  }
+    
+  .callout.callout-captioned.callout-style-simple .callout-content  p {
+    margin-top: 0;
+  }
+
+  .callout.callout-captioned.callout-style-default .callout-content  p {
+    margin-top: 0.7em;
+  }
+
+  .callout.callout-style-simple div.callout-caption {
+    border-bottom: none;
+    font-size: .9rem;
+    font-weight: 600;
+    opacity: 75%;
+  }
+
+  .callout.callout-style-default  div.callout-caption {
+    border-bottom: none;
+    font-weight: 600;
+    opacity: 85%;
+    font-size: 0.9rem;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-default div.callout-content {
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  .callout.callout-style-simple .callout-icon::before {
+    height: 1rem;
+    width: 1rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 1rem 1rem;
+  }
+
+  .callout.callout-style-default .callout-icon::before {
+    height: 0.9rem;
+    width: 0.9rem;
+    display: inline-block;
+    content: "";
+    background-repeat: no-repeat;
+    background-size: 0.9rem 0.9rem;
+  }
+
+  .callout-caption {
+    display: flex
+  }
+    
+  .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  .callout.no-icon::before {
+    display: none !important;
+  }
+
+  .callout.callout-captioned .callout-body > .callout-content > :last-child {
+    margin-bottom: 0.5rem;
+  }
+
+  .callout.callout-captioned .callout-icon::before {
+    margin-top: .5rem;
+    padding-right: .5rem;
+  }
+
+  .callout:not(.callout-captioned) .callout-icon::before {
+    margin-top: 1rem;
+    padding-right: .5rem;
+  }
+
+  /* Callout Types */
+
+  div.callout-note {
+    border-left-color: #4582ec !important;
+  }
+
+  div.callout-note .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEU0lEQVRYCcVXTWhcVRQ+586kSUMMxkyaElstCto2SIhitS5Ek8xUKV2poatCcVHtUlFQk8mbaaziwpWgglJwVaquitBOfhQXFlqlzSJpFSpIYyXNjBNiTCck7x2/8/LeNDOZxDuEkgOXe++553zfefee+/OYLOXFk3+1LLrRdiO81yNqZ6K9cG0P3MeFaMIQjXssE8Z1JzLO9ls20MBZX7oG8w9GxB0goaPrW5aNMp1yOZIa7Wv6o2ykpLtmAPs/vrG14Z+6d4jpbSKuhdcSyq9wGMPXjonwmESXrriLzFGOdDBLB8Y6MNYBu0dRokSygMA/mrun8MGFN3behm6VVAwg4WR3i6FvYK1T7MHo9BK7ydH+1uurECoouk5MPRyVSBrBHMYwVobG2aOXM07sWrn5qgB60rc6mcwIDJtQrnrEr44kmy+UO9r0u9O5/YbkS9juQckLed3DyW2XV/qWBBB3ptvI8EUY3I9p/67OW+g967TNr3Sotn3IuVlfMLVnsBwH4fsnebJvyGm5GeIUA3jljERmrv49SizPYuq+z7c2H/jlGC+Ghhupn/hcapqmcudB9jwJ/3jvnvu6vu5lVzF1fXyZuZZ7U8nRmVzytvT+H3kilYvH09mLWrQdwFSsFEsxFVs5fK7A0g8gMZjbif4ACpKbjv7gNGaD8bUrlk8x+KRflttr22JEMRUbTUwwDQScyzPgedQHZT0xnx7ujw2jfVfExwYHwOsDTjLdJ2ebmeQIlJ7neo41s/DrsL3kl+W2lWvAga0tR3zueGr6GL78M3ifH0rGXrBC2aAR8uYcIA5gwV8zIE8onoh8u0Fca/ciF7j1uOzEnqcIm59sEXoGc0+z6+H45V1CvAvHcD7THztu669cnp+L0okAeIc6zjbM/24LgGM1gZk7jnRu1aQWoU9sfUOuhrmtaPIO3YY1KLLWZaEO5TKUbMY5zx8W9UJ6elpLwKXbsaZ4EFl7B4bMtDv0iRipKoDQT2sNQI9b1utXFdYisi+wzZ/ri/1m7QfDgEuvgUUEIJPq3DhX/5DWNqIXDOweC2wvIR90Oq3lDpdMIgD2r0dXvGdsEW5H6x6HLRJYU7C69VefO1x8Gde1ZFSJLfWS1jbCnhtOPxmpfv2LXOA2Xk2tvnwKKPFuZ/oRmwBwqRQDcKNeVQkYcOjtWVBuM/JuYw5b6isojIkYxyYAFn5K7ZBF10fea52y8QltAg6jnMqNHFBmGkQ1j+U43HMi2xMar1Nv0zGsf1s8nUsmUtPOOrbFIR8bHFDMB5zL13Gmr/kGlCkUzedTzzmzsaJXhYawnA3UmARpiYj5ooJZiUoxFRtK3X6pgNPv+IZVPcnwbOl6f+aBaO1CNvPW9n9LmCp01nuSaTRF2YxHqZ8DYQT6WsXT+RD6eUztwYLZ8rM+rcPxamv1VQzFUkzFXvkiVrySGQgJNvXHJAxiU3/NwiC03rSf05VBaPtu/Z7/B8Yn/w7eguloAAAAAElFTkSuQmCC');
+  }
+
+  div.callout-note.callout-style-default .callout-caption {
+    background-color: #dae6fb
+  }
+
+  div.callout-important {
+    border-left-color: #d9534f !important;
+  }
+
+  div.callout-important .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAEKklEQVRYCcVXTWhcVRS+575MJym48A+hSRFr00ySRQhURRfd2HYjk2SSTokuBCkU2o0LoSKKraKIBTcuFCoidGFD08nkBzdREbpQ1EDNIv8qSGMFUboImMSZd4/f9zJv8ibJMC8xJQfO3HPPPef7zrvvvnvviIkpC9nsw0UttFunbUhpFzFtarSd6WJkStVMw5xyVqYTvkwfzuf/5FgtkVoB0729j1rjXwThS7Vio+Mo6DNnvLfahoZ+i/o32lULuJ3NNiz7q6+pyAUkJaFF6JwaM2lUJlV0MlnQn5aTRbEu0SEqHUa0A4AdiGuB1kFXRfVyg5d87+Dg4DL6m2TLAub60ilj7A1Ec4odSAc8X95sHh7+ZRPCFo6Fnp7HfU/fBng/hi10CjCnWnJjsxvDNxWw0NfV6Rv5GgP3I3jGWXumdTD/3cbEOP2ZbOZp69yniG3FQ9z1jD7bnBu9Fc2tKGC2q+uAJOQHBDRiZX1x36o7fWBs7J9ownbtO+n0/qWkvW7UPIfc37WgT6ZGR++EOJyeQDSb9UB+DZ1G6DdLDzyS+b/kBCYGsYgJbSQHuThGKRcw5xdeQf8YdNHsc6ePXrlSYMBuSIAFTGAtQo+VuALo4BX83N190NWZWbynBjhOHsmNfFWLeL6v+ynsA58zDvvAC8j5PkbOcXCMg2PZFk3q8MjI7WAG/Dp9AwP7jdGBOOQkAvlFUB+irtm16I1Zw9YBcpGTGXYmk3kQIC/Cds55l+iMI3jqhjAuaoe+am2Jw5GT3Nbz3CkE12NavmzN5+erJW7046n/CH1RO/RVa8lBLozXk9uqykkGAyRXLWlLv5jyp4RFsG5vGVzpDLnIjTWgnRy2Rr+tDKvRc7Y8AyZq10jj8DqXdnIRNtFZb+t/ZRtXcDiVnzpqx8mPcDWxgARUqx0W1QB9MeUZiNrV4qP+Ehc+BpNgATsTX8ozYKL2NtFYAHc84fG7ndxUPr+AR/iQSns7uSUufAymwDOb2+NjK27lEFocm/EE2WpyIy/Hi66MWuMKJn8RvxIcj87IM5Vh9663ziW36kR0HNenXuxmfaD8JC7tfKbrhFr7LiZCrMjrzTeGx+PmkosrkNzW94ObzwocJ7A1HokLolY+AvkTiD/q1H0cN48c5EL8Crkttsa/AXQVDmutfyku0E7jShx49XqV3MFK8IryDhYVbj7Sj2P2eBxwcXoe8T8idsKKPRcnZw1b+slFTubwUwhktrfnAt7J++jwQtLZcm3sr9LQrjRzz6cfMv9aLvgmnAGvpoaGLxM4mAEaLV7iAzQ3oU0IvD5x9ix3yF2RAAuYAOO2f7PEFWCXZ4C9Pb2UsgDeVnFSpbFK7/IWu7TPTvBqzbGdCHOJQSxiEjt6IyZmxQyEJHv6xyQsYk//moVFsN2zP6fRImjfq7/n/wFDguUQFNEwugAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-important.callout-style-default .callout-caption {
+    background-color: #f7dddc
+  }
+
+  div.callout-warning {
+    border-left-color: #f0ad4e !important;
+  }
+
+  div.callout-warning .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAAETklEQVRYCeVWW2gcVRg+58yaTUnizqbipZeX4uWhBEniBaoUX1Ioze52t7sRq6APio9V9MEaoWlVsFasRq0gltaAPuxms8lu0gcviE/FFOstVbSIxgcv6SU7EZqmdc7v9+9mJtNks51NTUH84ed889/PP+cmxP+d5FIbMJmNbpREu4WUkiTtCicKny0l1pIKmBzovF2S+hIJHX8iEu3hZJ5lNZGqyRrGSIQpq15AzF28jgpeY6yk6GVdrfFqdrD6Iw+QlB8g0YS2g7dyQmXM/IDhBhT0UCiRf59lfqmmDvzRt6kByV/m4JjtzuaujMUM2c5Z2d6JdKrRb3K2q6mA+oYVz8JnDdKPmmNthzkAk/lN63sYPgevrguc72aZX/L9C6x09GYyxBgCX4NlvyGUHOKELlm5rXeR1kchuChJt4SSwyddZRXgvwMGvYo4QSlk3/zkHD8UHxwVJA6zjZZqP8v8kK8OWLnIZtLyCAJagYC4rTGW/9Pqj92N/c+LUaAj27movwbi19tk/whRCIE7Q9vyI6yvRpftAKVTdUjOW40X3h5OXsKCdmFcx0xlLJoSuQngnrJe7Kcjm4OMq9FlC7CMmScQANuNvjfP3PjGXDBaUQmbp296S5L4DrpbrHN1T87ZVEZVCzg1FF0Ft+dKrlLukI+/c9ENo+TvlTDbYFvuKPtQ9+l052rXrgKoWkDAFnvh0wTOmYn8R5f4k/jN/fZiCM1tQx9jQQ4ANhqG4hiL0qIFTGViG9DKB7GYzgubnpofgYRwO+DFjh0Zin2m4b/97EDkXkc+f6xYAPX0KK2I/7fUQuwzuwo/L3AkcjugPNixC8cHf0FyPjWlItmLxWw4Ou9YsQCr5fijMGoD/zpdRy95HRysyXA74MWOnscpO4j2y3HAVisw85hX5+AFBRSHt4ShfLFkIMXTqyKFc46xdzQM6XbAi702a7sy04J0+feReMFKp5q9esYLCqAZYw/k14E/xcLLsFElaornTuJB0svMuJINy8xkIYuL+xPAlWRceH6+HX7THJ0djLUom46zREu7tTkxwmf/FdOZ/sh6Q8qvEAiHpm4PJ4a/doJe0gH1t+aHRgCzOvBvJedEK5OFE5jpm4AGP2a8Dxe3gGJ/pAutug9Gp6he92CsSsWBaEcxGx0FHytmIpuqGkOpldqNYQK8cSoXvd+xLxXADw0kf6UkJNFtdo5MOgaLjiQOQHcn+A6h5NuL2s0qsC2LOM75PcF3yr5STuBSAcGG+meA14K/CI21HcS4LBT6tv0QAh8Dr5l93AhZzG5ZJ4VxAqdZUEl9z7WJ4aN+svMvwHHL21UKTd1mqvChH7/Za5xzXBBKrUcB0TQ+Ulgkfbi/H/YT5EptrGzsEK7tR1B7ln9BBwckYfMiuSqklSznIuoIIOM42MQO+QnduCoFCI0bpkzjCjddHPN/F+2Yu+sd9bKNpVwHhbS3LluK/0zgfwD0xYI5dXuzlQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-warning.callout-style-default .callout-caption {
+    background-color: #fcefdc
+  }
+
+  div.callout-tip {
+    border-left-color: #02b875 !important;
+  }
+
+  div.callout-tip .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAADr0lEQVRYCe1XTWgTQRj9ZjZV8a9SPIkKgj8I1bMHsUWrqYLVg4Ue6v9BwZOxSYsIerFao7UiUryIqJcqgtpimhbBXoSCVxUFe9CTiogUrUp2Pt+3aUI2u5vdNh4dmMzOzHvvezuz8xNFM0mjnbXaNu1MvFWRXkXEyE6aYOYJpdW4IXuA4r0fo8qqSMDBU0v1HJUgVieAXxzCsdE/YJTdFcVIZQNMyhruOMJKXYFoLfIfIvVIMWdsrd+Rpd86ZmyzzjJmLStqRn0v8lzkb4rVIXvnpScOJuAn2ACC65FkPzEdEy4TPWRLJ2h7z4cArXzzaOdKlbOvKKX25Wl00jSnrwVxAg3o4dRxhO13RBSdNvH0xSARv3adTXbBdTf64IWO2vH0LT+cv4GR1DJt+DUItaQogeBX/chhbTBxEiZ6gftlDNXTrvT7co4ub5A6gp9HIcHvzTa46OS5fBeP87Qm0fQkr4FsYgVQ7Qg+ZayaDg9jhg1GkWj8RG6lkeSacrrHgDaxdoBiZPg+NXV/KifMuB6//JmYH4CntVEHy/keA6x4h4CU5oFy8GzrBS18cLJMXcljAKB6INjWsRcuZBWVaS3GDrqB7rdapVIeA+isQ57Eev9eCqzqOa81CY05VLd6SamW2wA2H3SiTbnbSxmzfp7WtKZkqy4mdyAlGx7ennghYf8voqp9cLSgKdqNfa6RdRsAAkPwRuJZNbpByn+RrJi1RXTwdi8RQF6ymDwGMAtZ6TVE+4uoKh+MYkcLsT0Hk8eAienbiGdjJHZTpmNjlbFJNKDVAp2fJlYju6IreQxQ08UJDNYdoLSl6AadO+fFuCQqVMB1NJwPm69T04Wv5WhfcWyfXQB+wXRs1pt+nCknRa0LVzSA/2B+a9+zQJadb7IyyV24YAxKp2Jqs3emZTuNnKxsah+uabKbMk7CbTgJx/zIgQYErIeTKRQ9yD9wxVof5YolPHqaWo7TD6tJlh7jQnK5z2n3+fGdggIOx2kaa2YI9QWarc5Ce1ipNWMKeSG4DysFF52KBmTNMmn5HqCFkwy34rDg05gDwgH3bBi+sgFhN/e8QvRn8kbamCOhgrZ9GJhFDgfcMHzFb6BAtjKpFhzTjwv1KCVuxHvCbsSiEz4CANnj84cwHdFXAbAOJ4LTSAawGWFn5tDhLMYz6nWeU2wJfIhmIJBefcd/A5FWQWGgrWzyORZ3Q6HuV+Jf0Bj+BTX69fm1zWgK7By1YTXchFDORywnfQ7GpzOo6S+qECrsx2ifVQAAAABJRU5ErkJggg==');
+  }
+
+  div.callout-tip.callout-style-default .callout-caption {
+    background-color: #ccf1e3
+  }
+
+  div.callout-caution {
+    border-left-color: #fd7e14 !important;
+  }
+
+  div.callout-caution .callout-icon::before {
+    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACAAAAAgCAYAAABzenr0AAAAAXNSR0IArs4c6QAAAERlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAA6ABAAMAAAABAAEAAKACAAQAAAABAAAAIKADAAQAAAABAAAAIAAAAACshmLzAAACV0lEQVRYCdVWzWoUQRCuqp2ICBLJXgITZL1EfQDBW/bkzUMUD7klD+ATSHBEfAIfQO+iXsWDxJsHL96EHAwhgzlkg8nBg25XWb0zIb0zs9muYYWkoKeru+vn664fBqElyZNuyh167NXJ8Ut8McjbmEraKHkd7uAnAFku+VWdb3reSmRV8PKSLfZ0Gjn3a6Xlcq9YGb6tADjn+lUfTXtVmaZ1KwBIvFI11rRXlWlatwIAAv2asaa9mlB9wwygiDX26qaw1yYPzFXg2N1GgG0FMF8Oj+VIx7E/03lHx8UhvYyNZLN7BwSPgekXXLribw7w5/c8EF+DBK5idvDVYtEEwMeYefjjLAdEyQ3M9nfOkgnPTEkYU+sxMq0BxNR6jExrAI31H1rzvLEfRIdgcv1XEdj6QTQAS2wtstEALLG1yEZ3QhH6oDX7ExBSFEkFINXH98NTrme5IOaaA7kIfiu2L8A3qhH9zRbukdCqdsA98TdElyeMe5BI8Rs2xHRIsoTSSVFfCFCWGPn9XHb4cdobRIWABNf0add9jakDjQJpJ1bTXOJXnnRXHRf+dNL1ZV1MBRCXhMbaHqGI1JkKIL7+i8uffuP6wVQAzO7+qVEbF6NbS0LJureYcWXUUhH66nLR5rYmva+2tjRFtojkM2aD76HEGAD3tPtKM309FJg5j/K682ywcWJ3PASCcycH/22u+Bh7Aa0ehM2Fu4z0SAE81HF9RkB21c5bEn4Dzw+/qNOyXr3DCTQDMBOdhi4nAgiFDGCinIa2owCEChUwD8qzd03PG+qdW/4fDzjUMcE1ZpIAAAAASUVORK5CYII=');
+  }
+
+  div.callout-caution.callout-style-default .callout-caption {
+    background-color: #ffe5d0
+  }
+
+  </style>
+  <style type="text/css">
+    .reveal div.sourceCode {
+      margin: 0;
+      overflow: auto;
+    }
+    .reveal div.hanging-indent {
+      margin-left: 1em;
+      text-indent: -1em;
+    }
+    .reveal .slide:not(.center) {
+      height: 100%;
+    }
+    .reveal .slide.scrollable {
+      overflow-y: auto;
+    }
+    .reveal .footnotes {
+      height: 100%;
+      overflow-y: auto;
+    }
+    .reveal .slide .absolute {
+      position: absolute;
+      display: block;
+    }
+    .reveal .footnotes ol {
+      counter-reset: ol;
+      list-style-type: none; 
+      margin-left: 0;
+    }
+    .reveal .footnotes ol li:before {
+      counter-increment: ol;
+      content: counter(ol) ". "; 
+    }
+    .reveal .footnotes ol li > p:first-child {
+      display: inline-block;
+    }
+    .reveal .slide ul,
+    .reveal .slide ol {
+      margin-bottom: 0.5em;
+    }
+    .reveal .slide ul li,
+    .reveal .slide ol li {
+      margin-top: 0.4em;
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide ul[role="tablist"] li {
+      margin-bottom: 0;
+    }
+    .reveal .slide ul li > *:first-child,
+    .reveal .slide ol li > *:first-child {
+      margin-block-start: 0;
+    }
+    .reveal .slide ul li > *:last-child,
+    .reveal .slide ol li > *:last-child {
+      margin-block-end: 0;
+    }
+    .reveal .slide .columns:nth-child(3) {
+      margin-block-start: 0.8em;
+    }
+    .reveal blockquote {
+      box-shadow: none;
+    }
+    .reveal .tippy-content>* {
+      margin-top: 0.2em;
+      margin-bottom: 0.7em;
+    }
+    .reveal .tippy-content>*:last-child {
+      margin-bottom: 0.2em;
+    }
+    .reveal .slide > img.stretch.quarto-figure-center,
+    .reveal .slide > img.r-stretch.quarto-figure-center {
+      display: block;
+      margin-left: auto;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-left,
+    .reveal .slide > img.r-stretch.quarto-figure-left  {
+      display: block;
+      margin-left: 0;
+      margin-right: auto; 
+    }
+    .reveal .slide > img.stretch.quarto-figure-right,
+    .reveal .slide > img.r-stretch.quarto-figure-right  {
+      display: block;
+      margin-left: auto;
+      margin-right: 0; 
+    }
+  </style>
+  
+  <script src="ClusterProfiler_files/libs/kePrint-0.0.1/kePrint.js"></script>
+  <link href="ClusterProfiler_files/libs/lightable-0.0.1/lightable.css" rel="stylesheet">
+</head>
+<body class="quarto-light">
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide" class="quarto-title-block center">
+  <h1 class="title">Session 5: ClusterProfiler</h1>
+
+<div class="quarto-title-authors">
+<div class="quarto-title-author">
+<div class="quarto-title-author-name">
+Graham Hamilton 
+</div>
+</div>
+</div>
+
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Loading packages</li>
+<li>Loading results from DESeq2</li>
+<li>Filtering results by fold change and adjusted p value</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<ul>
+<li>Gene ontology analysis</li>
+<li>Pathway enrichment</li>
+<li>Cell marker gene set enrichment</li>
+<li>Visualisation</li>
+</ul>
+</div>
+</div>
+</section>
+<section id="ingenuity-pathway-analysis" class="slide level2">
+<h2>Ingenuity Pathway Analysis</h2>
+<p>Qiagen Ingenuity Pathway Analysis</p>
+<ul>
+<li>Canonical pathways</li>
+<li>Upstream analysis</li>
+<li>Diseases &amp; functions</li>
+<li>Regulator effects</li>
+<li><strong>Expensive annual licence</strong></li>
+</ul>
+</section>
+<section id="david" class="slide level2">
+<h2>DAVID</h2>
+<ul>
+<li>Web server</li>
+<li>Functional enrichment analysis</li>
+<li>Functional annotation</li>
+<li><strong>Free to use</strong></li>
+</ul>
+
+<aside><div>
+<div style="font-size: 50%;">
+<p>Brad T Sherman, Ming Hao, Ju Qiu, Xiaoli Jiao, Michael W Baseler, H Clifford Lane, Tomozumi Imamichi, Weizhong Chang, DAVID: a web server for functional enrichment analysis and functional annotation of gene lists (2021 update), Nucleic Acids Research, Volume 50, Issue W1, 5 July 2022, Pages W216–W221, https://doi.org/10.1093/nar/gkac194</p>
+</div>
+</div></aside></section>
+<section id="clusterprofiler" class="slide level2 smaller">
+<h2>ClusterProfiler</h2>
+<p>ClusterProfiler is an R package that performs functional enrichment analysis, to aide interpretation of high throughput data like RNASeq.</p>
+<ul>
+<li>Over representation analysis
+<ul>
+<li>Identify pathways or ontologies annotated be the gene set greater than expected by chance, ORA</li>
+</ul></li>
+<li>Gene set enrichment analysis, GSEA
+<ul>
+<li>Similar to ORA but with differing statistical approach</li>
+</ul></li>
+<li><strong>Free to use</strong></li>
+</ul>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>https://yulab-smu.top/biomedical-knowledge-mining-book/index.html <br><br> Wu T, Hu E, Xu S, Chen M, Guo P, Dai Z, et al.&nbsp;clusterProfiler 4.0: A universal enrichment tool for interpreting omics data. Innovation (Camb). 2021;2(3):100141., https://doi.org/10.1016/j.xinn.2021.100141</p>
+</div>
+</div></aside></section>
+<section id="cran-packages" class="slide level2">
+<h2>CRAN packages</h2>
+<p>Install CRAN packages</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>cran.packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"tidyverse"</span>,</span>
+<span id="cb1-2"><a href="#cb1-2"></a>                   <span class="st">"ggrepel"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3"></a>                   <span class="st">"kableExtra"</span>,</span>
+<span id="cb1-4"><a href="#cb1-4"></a>                   <span class="st">"ggupset"</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a></span>
+<span id="cb1-6"><a href="#cb1-6"></a>cran.load <span class="ot">&lt;-</span> <span class="cf">function</span>(pkg){</span>
+<span id="cb1-7"><a href="#cb1-7"></a>        new.pkg <span class="ot">&lt;-</span> pkg[<span class="sc">!</span>(pkg <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">"Package"</span>])]</span>
+<span id="cb1-8"><a href="#cb1-8"></a>        <span class="cf">if</span> (<span class="fu">length</span>(new.pkg)){</span>
+<span id="cb1-9"><a href="#cb1-9"></a>          <span class="fu">install.packages</span>(new.pkg, <span class="at">dependencies =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-10"><a href="#cb1-10"></a>          }</span>
+<span id="cb1-11"><a href="#cb1-11"></a>        <span class="fu">sapply</span>(pkg, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>}</span>
+<span id="cb1-13"><a href="#cb1-13"></a><span class="fu">cran.load</span>(cran.packages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="bioconductor-packages" class="slide level2">
+<h2>Bioconductor Packages</h2>
+<p>Install Biocondustor packages</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>bioconductor.packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"org.Hs.eg.db"</span>,</span>
+<span id="cb2-2"><a href="#cb2-2"></a>                           <span class="st">"clusterProfiler"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>                           <span class="st">"enrichplot"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>                           <span class="st">"pathview"</span>)</span>
+<span id="cb2-5"><a href="#cb2-5"></a></span>
+<span id="cb2-6"><a href="#cb2-6"></a>bioconductor.load <span class="ot">&lt;-</span> <span class="cf">function</span>(pkg){</span>
+<span id="cb2-7"><a href="#cb2-7"></a>        new.pkg <span class="ot">&lt;-</span> pkg[<span class="sc">!</span>(pkg <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">"Package"</span>])]</span>
+<span id="cb2-8"><a href="#cb2-8"></a>        <span class="cf">if</span> (<span class="fu">length</span>(new.pkg)){</span>
+<span id="cb2-9"><a href="#cb2-9"></a>          <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-10"><a href="#cb2-10"></a>            <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb2-11"><a href="#cb2-11"></a>            BiocManager<span class="sc">::</span><span class="fu">install</span>(new.pkg)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>        }</span>
+<span id="cb2-13"><a href="#cb2-13"></a>        <span class="fu">sapply</span>(pkg, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-14"><a href="#cb2-14"></a>}</span>
+<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">bioconductor.load</span>(bioconductor.packages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="statistical-cut-off-values" class="slide level2">
+<h2>Statistical cut off values</h2>
+<p>Create the cut off used for filtering results</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1"></a>pvalueCutoff <span class="ot">&lt;-</span> <span class="fl">0.05</span> <span class="co"># P value</span></span>
+<span id="cb3-2"><a href="#cb3-2"></a>qvalueCutoff <span class="ot">&lt;-</span> <span class="fl">0.1</span> <span class="co"># Adjusted P value</span></span>
+<span id="cb3-3"><a href="#cb3-3"></a>foldchange <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># Fold change, usually fold change is log2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="load-previous-session-results" class="slide level2 smaller">
+<h2>Load Previous Session Results</h2>
+<p>Read in the results file from Session 4</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>de_results <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"./data/Treatment_vs_Control.genes.tsv"</span>, </span>
+<span id="cb4-2"><a href="#cb4-2"></a>                         <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> ensembl_gene_id </th>
+   <th style="text-align:right;"> baseMean </th>
+   <th style="text-align:right;"> log2FoldChange </th>
+   <th style="text-align:right;"> lfcSE </th>
+   <th style="text-align:right;"> stat </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> padj </th>
+   <th style="text-align:left;"> external_gene_name </th>
+   <th style="text-align:left;"> chromosome_name </th>
+   <th style="text-align:right;"> start_position </th>
+   <th style="text-align:right;"> end_position </th>
+   <th style="text-align:left;"> gene_biotype </th>
+   <th style="text-align:right;"> entrezgene_id </th>
+   <th style="text-align:right;"> Control_1 </th>
+   <th style="text-align:right;"> Control_2 </th>
+   <th style="text-align:right;"> Control_3 </th>
+   <th style="text-align:right;"> Control_4 </th>
+   <th style="text-align:right;"> Treatment_1 </th>
+   <th style="text-align:right;"> Treatment_2 </th>
+   <th style="text-align:right;"> Treatment_3 </th>
+   <th style="text-align:right;"> Treatment_4 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ENSG00000157191 </td>
+   <td style="text-align:right;"> 8171.718 </td>
+   <td style="text-align:right;"> -2.429669 </td>
+   <td style="text-align:right;"> 0.0374863 </td>
+   <td style="text-align:right;"> -64.81491 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> NECAP2 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 16440721 </td>
+   <td style="text-align:right;"> 16460078 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 55707 </td>
+   <td style="text-align:right;"> 13556.481 </td>
+   <td style="text-align:right;"> 13858.745 </td>
+   <td style="text-align:right;"> 14103.125 </td>
+   <td style="text-align:right;"> 13621.526 </td>
+   <td style="text-align:right;"> 2555.7914 </td>
+   <td style="text-align:right;"> 2514.9013 </td>
+   <td style="text-align:right;"> 2576.0675 </td>
+   <td style="text-align:right;"> 2587.1079 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000117090 </td>
+   <td style="text-align:right;"> 2322.100 </td>
+   <td style="text-align:right;"> -5.224265 </td>
+   <td style="text-align:right;"> 0.0775600 </td>
+   <td style="text-align:right;"> -67.35771 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> SLAMF1 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 160608106 </td>
+   <td style="text-align:right;"> 160647044 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 6504 </td>
+   <td style="text-align:right;"> 4554.992 </td>
+   <td style="text-align:right;"> 4369.232 </td>
+   <td style="text-align:right;"> 4578.598 </td>
+   <td style="text-align:right;"> 4588.982 </td>
+   <td style="text-align:right;"> 118.6919 </td>
+   <td style="text-align:right;"> 125.4663 </td>
+   <td style="text-align:right;"> 127.4026 </td>
+   <td style="text-align:right;"> 113.4383 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000026751 </td>
+   <td style="text-align:right;"> 4495.926 </td>
+   <td style="text-align:right;"> -4.690935 </td>
+   <td style="text-align:right;"> 0.0870932 </td>
+   <td style="text-align:right;"> -53.86110 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> SLAMF7 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 160739057 </td>
+   <td style="text-align:right;"> 160754821 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 57823 </td>
+   <td style="text-align:right;"> 8364.751 </td>
+   <td style="text-align:right;"> 8424.900 </td>
+   <td style="text-align:right;"> 9178.086 </td>
+   <td style="text-align:right;"> 8659.389 </td>
+   <td style="text-align:right;"> 366.9206 </td>
+   <td style="text-align:right;"> 301.1190 </td>
+   <td style="text-align:right;"> 320.1741 </td>
+   <td style="text-align:right;"> 352.0674 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="results-directory" class="slide level2">
+<h2>Results Directory</h2>
+<p>Create a results directory for the ClusterProfiler results files</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>results_directory <span class="ot">&lt;-</span> <span class="st">"ClusterProfiler"</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">dir.create</span>(results_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="filter" class="slide level2 smaller">
+<h2>Filter</h2>
+<p>Filter the results table for genes that have a p adjusted value of 0.1 and a log fold change of 1.</p>
+<p><strong>NOTE:</strong> The use of the absolute value for the log2 fold change.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>filtered_de_results <span class="ot">&lt;-</span> de_results <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">filter</span>(padj <span class="sc">&lt;</span> qvalueCutoff,</span>
+<span id="cb6-3"><a href="#cb6-3"></a>         <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> foldchange) <span class="sc">%&gt;%</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> ensembl_gene_id </th>
+   <th style="text-align:right;"> baseMean </th>
+   <th style="text-align:right;"> log2FoldChange </th>
+   <th style="text-align:right;"> lfcSE </th>
+   <th style="text-align:right;"> stat </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> padj </th>
+   <th style="text-align:left;"> external_gene_name </th>
+   <th style="text-align:left;"> chromosome_name </th>
+   <th style="text-align:right;"> start_position </th>
+   <th style="text-align:right;"> end_position </th>
+   <th style="text-align:left;"> gene_biotype </th>
+   <th style="text-align:right;"> entrezgene_id </th>
+   <th style="text-align:right;"> Control_1 </th>
+   <th style="text-align:right;"> Control_2 </th>
+   <th style="text-align:right;"> Control_3 </th>
+   <th style="text-align:right;"> Control_4 </th>
+   <th style="text-align:right;"> Treatment_1 </th>
+   <th style="text-align:right;"> Treatment_2 </th>
+   <th style="text-align:right;"> Treatment_3 </th>
+   <th style="text-align:right;"> Treatment_4 </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ENSG00000157191 </td>
+   <td style="text-align:right;"> 8171.718 </td>
+   <td style="text-align:right;"> -2.429669 </td>
+   <td style="text-align:right;"> 0.0374863 </td>
+   <td style="text-align:right;"> -64.81491 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> NECAP2 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 16440721 </td>
+   <td style="text-align:right;"> 16460078 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 55707 </td>
+   <td style="text-align:right;"> 13556.481 </td>
+   <td style="text-align:right;"> 13858.745 </td>
+   <td style="text-align:right;"> 14103.125 </td>
+   <td style="text-align:right;"> 13621.526 </td>
+   <td style="text-align:right;"> 2555.7914 </td>
+   <td style="text-align:right;"> 2514.9013 </td>
+   <td style="text-align:right;"> 2576.0675 </td>
+   <td style="text-align:right;"> 2587.1079 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000117090 </td>
+   <td style="text-align:right;"> 2322.100 </td>
+   <td style="text-align:right;"> -5.224265 </td>
+   <td style="text-align:right;"> 0.0775600 </td>
+   <td style="text-align:right;"> -67.35771 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> SLAMF1 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 160608106 </td>
+   <td style="text-align:right;"> 160647044 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 6504 </td>
+   <td style="text-align:right;"> 4554.992 </td>
+   <td style="text-align:right;"> 4369.232 </td>
+   <td style="text-align:right;"> 4578.598 </td>
+   <td style="text-align:right;"> 4588.982 </td>
+   <td style="text-align:right;"> 118.6919 </td>
+   <td style="text-align:right;"> 125.4663 </td>
+   <td style="text-align:right;"> 127.4026 </td>
+   <td style="text-align:right;"> 113.4383 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000026751 </td>
+   <td style="text-align:right;"> 4495.926 </td>
+   <td style="text-align:right;"> -4.690935 </td>
+   <td style="text-align:right;"> 0.0870932 </td>
+   <td style="text-align:right;"> -53.86110 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> SLAMF7 </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 160739057 </td>
+   <td style="text-align:right;"> 160754821 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 57823 </td>
+   <td style="text-align:right;"> 8364.751 </td>
+   <td style="text-align:right;"> 8424.900 </td>
+   <td style="text-align:right;"> 9178.086 </td>
+   <td style="text-align:right;"> 8659.389 </td>
+   <td style="text-align:right;"> 366.9206 </td>
+   <td style="text-align:right;"> 301.1190 </td>
+   <td style="text-align:right;"> 320.1741 </td>
+   <td style="text-align:right;"> 352.0674 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p>There are <strong>4940</strong> genes remaining after filtering.</p>
+</section>
+<section id="gene-ontology" class="slide level2 smaller">
+<h2>Gene Ontology</h2>
+<div style="font-size: 75%;">
+<ul>
+<li>Ontology is a formal representation of knowledgebase for the functions of genes, computer and human readable</li>
+<li>GO split into three domains
+<ul>
+<li>Molecular Function
+<ul>
+<li>Molecular-level activities performed by gene products e.g.&nbsp;catalysis or transport</li>
+</ul></li>
+<li>Cellular Component
+<ul>
+<li>Location relative to cellular structure of gene function e.g.&nbsp;mitochondrian or ribosome</li>
+</ul></li>
+<li>Biological Process
+<ul>
+<li>Larger processes accomplished by multiple molecular activities e.g DNA repair or signal transduction</li>
+</ul></li>
+</ul></li>
+<li><strong>GO does not describe pathways</strong></li>
+</ul>
+</div>
+</section>
+<section id="over-representation-analysis" class="slide level2 smaller">
+<h2>Over Representation Analysis</h2>
+<div style="font-size: 75%;">
+<ul>
+<li>Widely used approach to determine whether known biological functions or processes are over-represented in a set of differentially expressed genes</li>
+</ul>
+<p>Example - 57 genes were differentially expressed out of a total of 17,980. Among the differentially expressed genes, 28 are annotated to a gene set</p>
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:right;"> gene.not.interest </th>
+   <th style="text-align:right;"> gene.in.interest </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> In_category </td>
+   <td style="text-align:right;"> 2613 </td>
+   <td style="text-align:right;"> 28 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> not_in_category </td>
+   <td style="text-align:right;"> 15310 </td>
+   <td style="text-align:right;"> 29 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+<div class="cell">
+
+</div>
+<p>Test significance using hypergeometric distribution, one-sided Fisher’s exact test. The un-corrected P value <strong>7.879194e-10</strong></p>
+</div>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>Boyle, Elizabeth I, Shuai Weng, Jeremy Gollub, Heng Jin, David Botstein, J Michael Cherry, and Gavin Sherlock. 2004. “GO::TermFinder–open Source Software for Accessing Gene Ontology Information and Finding Significantly Enriched Gene Ontology Terms Associated with a List of Genes.” Bioinformatics (Oxford, England) 20 (18): 3710–15. https://doi.org/10.1093/bioinformatics/bth456.</p>
+</div>
+</div></aside></section>
+<section id="gene-set-enrichment-analysis" class="slide level2 smaller">
+<h2>Gene Set Enrichment Analysis</h2>
+<ul>
+<li>Over representation analysis find genes where the difference is large but will fail where the difference is small.</li>
+<li>Gene Set Enrichment Analysis (GSEA) directly addresses this limitation.
+<ol type="1">
+<li>Calculate Enrichment Score (ES)</li>
+<li>Estimation of Significance Level of ES</li>
+<li>Adjustment for Multiple Hypothesis Testing</li>
+</ol></li>
+</ul>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>Subramanian, Aravind, Pablo Tamayo, Vamsi K. Mootha, Sayan Mukherjee, Benjamin L. Ebert, Michael A. Gillette, Amanda Paulovich, et al.&nbsp;2005. “Gene Set Enrichment Analysis: A Knowledge-Based Approach for Interpreting Genome-Wide Expression Profiles.” Proceedings of the National Academy of Sciences of the United States of America 102 (43): 15545–50. https://doi.org/10.1073/pnas.0506580102.</p>
+</div>
+</div></aside></section>
+<section id="gene-ontology-analysis" class="slide level2">
+<h2>Gene Ontology Analysis</h2>
+<p>Over representation analysis</p>
+<p>List of entrez ids for the differentially expressed genes, using the <strong>pull()</strong> command from dplyr</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>de_genes <span class="ot">&lt;-</span> filtered_de_results <span class="sc">%&gt;%</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">pull</span>(entrezgene_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 55707  6504 57823  2213  7431  5552</code></pre>
+</div>
+</div>
+</section>
+<section id="gene-ontology-analysis-1" class="slide level2 smaller">
+<h2>Gene Ontology Analysis</h2>
+<p>Over representation analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>go_ora <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(<span class="at">gene =</span> de_genes,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>                   <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
+<span id="cb9-3"><a href="#cb9-3"></a>                   <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose "BP","CC", "MF" or "ALL"</span></span>
+<span id="cb9-4"><a href="#cb9-4"></a>                   <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
+<span id="cb9-5"><a href="#cb9-5"></a>                   <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>,</span>
+<span id="cb9-6"><a href="#cb9-6"></a>                   <span class="at">qvalueCutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb9-7"><a href="#cb9-7"></a>                   <span class="at">readable =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> ID </th>
+   <th style="text-align:left;"> Description </th>
+   <th style="text-align:left;"> GeneRatio </th>
+   <th style="text-align:left;"> BgRatio </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> p.adjust </th>
+   <th style="text-align:right;"> qvalue </th>
+   <th style="text-align:left;"> geneID </th>
+   <th style="text-align:right;"> Count </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> GO:0005925 </td>
+   <td style="text-align:left;"> GO:0005925 </td>
+   <td style="text-align:left;"> focal adhesion </td>
+   <td style="text-align:left;"> 169/4702 </td>
+   <td style="text-align:left;"> 422/19869 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> VIM/SRC/PTK2B/ACTG1/CD44/ICAM1/MARCKS/ACTN1/PLAU/RDX/LCP1/LMO7/PTK2/ARHGAP31/FERMT2/YWHAE/MRC2/SDC4/ARPC2/MAP2K1/FLNB/CTTN/ITGB7/CAT/LRP1/FZD2/CD9/PABPC1/YES1/PPFIBP1/PFN1/IGF2R/ITGB1/GNB2/ITGA3/HMGA1/DDR2/NCKAP1/TNC/CAV1/RPL12/DPP4/PARVG/ZYX/ADGRE5/PAK1/SLC4A2/CYFIP1/FLNC/AKAP12/RAB21/CYBA/GJA1/PARVA/ARL14EP/PDLIM1/RRAS/ATP6V0A2/RHOG/ALCAM/CNN3/GSN/ACTN4/LIMA1/PARVB/PHLDB2/MMP14/SVIL/SLC9A1/RPS19/ACTN3/AMBRA1/FAT1/KIF23/JUP/RND3/CSRP2/ENG/HCK/HYOU1/PCBP2/ABCB4/HACD3/EPB41L2/PTPRC/HSPG2/TNS1/MAP4K4/MAP2K2/CD151/TSPAN4/PRAG1/AIF1L/ARHGEF7/CLASP1/SORBS1/ITGB2/ANXA6/RPLP0/RHOU/RPLP1/DAB2/ITGA5/TLN2/FHL3/ADGRB1/KRAS/ITGA6/NEXN/FZD1/ALOX15B/ITGA1/SH3KBP1/ACTB/LMLN/FGFR3/ITGB8/MYH9/SLC6A4/EPHA2/TGM2/TPM4/STARD8/SPRY4/ARHGAP22/CAV3/EHD3/CASS4/TRIP6/TLE2/FHL1/DST/SNTB2/PTK7/CDH13/ITGB5/WASF1/L1CAM/PLAUR/PVR/NECTIN2/ADAM9/FBLN7/LAYN/CD59/TNS3/NHS/EPB41L5/RPL5/SNTB1/CDC42EP1/DLC1/CPNE3/RHOA/ANXA1/AFAP1/DIXDC1/SCARF2/CORO2B/MCAM/OPRM1/ACTN2/ITGA2B/FHL2/SNAP23/ITGA4/ITGB4/CAV2/NFASC </td>
+   <td style="text-align:right;"> 169 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GO:0030055 </td>
+   <td style="text-align:left;"> GO:0030055 </td>
+   <td style="text-align:left;"> cell-substrate junction </td>
+   <td style="text-align:left;"> 172/4702 </td>
+   <td style="text-align:left;"> 432/19869 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> VIM/SRC/PTK2B/ACTG1/CD44/ICAM1/MARCKS/ACTN1/PLAU/RDX/LCP1/LMO7/PTK2/ARHGAP31/FERMT2/YWHAE/MRC2/SDC4/ARPC2/MAP2K1/FLNB/CTTN/ITGB7/CAT/LRP1/FZD2/CD9/PABPC1/YES1/PPFIBP1/PFN1/IGF2R/ITGB1/GNB2/ITGA3/HMGA1/DDR2/NCKAP1/TNC/CAV1/RPL12/DPP4/PARVG/ZYX/ADGRE5/PAK1/SLC4A2/CYFIP1/FLNC/AKAP12/RAB21/CYBA/GJA1/PARVA/ARL14EP/PDLIM1/RRAS/ATP6V0A2/RHOG/ALCAM/CNN3/GSN/ACTN4/LIMA1/PARVB/PHLDB2/MMP14/SVIL/SLC9A1/RPS19/ACTN3/AMBRA1/FAT1/KIF23/JUP/RND3/CSRP2/ENG/HCK/HYOU1/PCBP2/ABCB4/HACD3/EPB41L2/PTPRC/HSPG2/TNS1/MAP4K4/MAP2K2/CD151/TSPAN4/PRAG1/AIF1L/ARHGEF7/CLASP1/SORBS1/ITGB2/ANXA6/RPLP0/RHOU/RPLP1/DAB2/ITGA5/TLN2/FHL3/ADGRB1/KRAS/ITGA6/NEXN/FZD1/ALOX15B/ITGA1/SH3KBP1/ACTB/LMLN/FGFR3/ITGB8/MYH9/SLC6A4/EPHA2/TGM2/TPM4/STARD8/SPRY4/ARHGAP22/CAV3/EHD3/CASS4/TRIP6/TLE2/FHL1/DST/SNTB2/PTK7/CDH13/ITGB5/WASF1/L1CAM/PLAUR/PVR/NECTIN2/NRAP/EPPK1/ADAM9/FBLN7/LAYN/CD59/TNS3/NHS/EPB41L5/RPL5/SNTB1/CDC42EP1/DLC1/CPNE3/RHOA/ANXA1/AFAP1/DIXDC1/SCARF2/CORO2B/MCAM/SMPX/OPRM1/ACTN2/ITGA2B/FHL2/SNAP23/ITGA4/ITGB4/CAV2/NFASC </td>
+   <td style="text-align:right;"> 172 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GO:0045121 </td>
+   <td style="text-align:left;"> GO:0045121 </td>
+   <td style="text-align:left;"> membrane raft </td>
+   <td style="text-align:left;"> 135/4702 </td>
+   <td style="text-align:left;"> 326/19869 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:left;"> SRC/PTK2B/RFTN1/CD24/FAS/ICAM1/CAVIN1/LAT2/PECAM1/LCK/PGK1/PRKAR2B/CFLAR/MYOF/VDAC1/HMOX1/MYO1C/SDC4/KCNA3/PLLP/GPC1/TUBB/BST2/ITGAM/PPT1/TGFBR2/LRRK2/CLN6/BIRC2/ITGB1/RIPK1/SMO/TRADD/ENO2/CAV1/EFNA5/DPP4/CD55/GJA1/ARID3A/CRK/LRP4/TNF/LRP6/RTN4RL1/CARD11/EHD2/SPRED1/SERPINH1/ATP1B1/SLC9A1/FAIM2/SMPD2/ANGPT1/SCARB1/EPHB1/ADTRP/AKAP6/HCK/S100A10/ABCB4/STOML1/RET/ATP2B4/PTPRC/CD79A/TRAF2/CXADR/IRS1/SORBS1/ATP1A4/ITGB2/ADRA1B/EFNB1/SLC1A2/ITGA1/LRP8/SLC6A4/RGMB/MAL/CHRNA7/OLR1/SYNJ2/MYADM/CD8A/CAV3/FYN/PLPP3/CD19/FXYD1/INSR/CDH13/GABBR1/ATP1A2/LAT/S1PR1/MAPT/CR1/UNC5A/PTGS2/TFPI/KCNQ1/OPRD1/CHRNB2/CAVIN3/NOS1AP/F2R/ADCY1/STOM/MLC1/TNR/DLC1/TRPM8/ATP2B2/KCND2/ARC/MALL/EMP2/NFAM1/CD226/LY6K/OPRM1/PAG1/ADGRG1/CDH1/SELPLG/ABCG2/NTSR1/ADD2/TEX101/CD36/PTGIS/KCNE1/CAV2/FASLG </td>
+   <td style="text-align:right;"> 135 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="gene-ontology-analysis-2" class="slide level2 smaller">
+<h2>Gene Ontology Analysis</h2>
+<p>Gene set enrichment analysis</p>
+<p>Input is a named vector of log fold changes with entrez ids as the names, sorted</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>gsea_gene_list <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>log2FoldChange</span>
+<span id="cb10-2"><a href="#cb10-2"></a><span class="fu">names</span>(gsea_gene_list) <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>entrezgene_id</span>
+<span id="cb10-3"><a href="#cb10-3"></a>gsea_gene_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(gsea_gene_list, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>   84824   219970   344658     6439     5596     2327 
+7.372843 6.883795 6.746818 6.634223 6.440792 6.368684 </code></pre>
+</div>
+</div>
+</section>
+<section id="gene-ontology-analysis-3" class="slide level2 smaller">
+<h2>Gene Ontology Analysis</h2>
+<p>Gene set enrichment analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>go_gsea <span class="ot">&lt;-</span> <span class="fu">gseGO</span>(<span class="at">gene =</span> gsea_gene_list,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>                 <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
+<span id="cb12-3"><a href="#cb12-3"></a>                 <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose BP,CC, MF or ALL</span></span>
+<span id="cb12-4"><a href="#cb12-4"></a>                 <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
+<span id="cb12-5"><a href="#cb12-5"></a>                 <span class="at">minGSSize    =</span> <span class="dv">100</span>,</span>
+<span id="cb12-6"><a href="#cb12-6"></a>                 <span class="at">maxGSSize    =</span> <span class="dv">500</span>,</span>
+<span id="cb12-7"><a href="#cb12-7"></a>                 <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> ID </th>
+   <th style="text-align:left;"> Description </th>
+   <th style="text-align:right;"> setSize </th>
+   <th style="text-align:right;"> enrichmentScore </th>
+   <th style="text-align:right;"> NES </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> p.adjust </th>
+   <th style="text-align:right;"> qvalue </th>
+   <th style="text-align:right;"> rank </th>
+   <th style="text-align:left;"> leading_edge </th>
+   <th style="text-align:left;"> core_enrichment </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> GO:0031012 </td>
+   <td style="text-align:left;"> GO:0031012 </td>
+   <td style="text-align:left;"> extracellular matrix </td>
+   <td style="text-align:right;"> 194 </td>
+   <td style="text-align:right;"> -0.5084959 </td>
+   <td style="text-align:right;"> -1.811140 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1145 </td>
+   <td style="text-align:left;"> tags=49%, list=23%, signal=39% </td>
+   <td style="text-align:left;"> 5199/9423/121227/4185/81794/23671/89797/85301/9508/7474/2/7098/2201/2199/146760/2811/176/1463/27299/63827/30008/83729/2335/26033/375790/50509/2239/59/84034/3918/4015/8482/284/1280/9719/8785/3697/2161/6383/5155/129080/3383/1307/5654/64499/5269/80760/4313/7177/129804/1311/54361/84171/3912/162466/2152/9313/4052/84894/64856/1191/51162/333/2263/1462/7052/2615/8076/1291/5265/51129/4321/4693/151887/3898/2267/1292/3914/1303/6678/145864/4312/54507/1289/1946/4319/1294/3371/5054/4016/64129/4316/3491/43/1277 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GO:0030312 </td>
+   <td style="text-align:left;"> GO:0030312 </td>
+   <td style="text-align:left;"> external encapsulating structure </td>
+   <td style="text-align:right;"> 195 </td>
+   <td style="text-align:right;"> -0.5068103 </td>
+   <td style="text-align:right;"> -1.805493 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 1145 </td>
+   <td style="text-align:left;"> tags=49%, list=23%, signal=39% </td>
+   <td style="text-align:left;"> 5199/9423/121227/4185/81794/23671/89797/85301/9508/7474/2/7098/2201/2199/146760/2811/176/1463/27299/63827/30008/83729/2335/26033/375790/50509/2239/59/84034/3918/4015/8482/284/1280/9719/8785/3697/2161/6383/5155/129080/3383/1307/5654/64499/5269/80760/4313/7177/129804/1311/54361/84171/3912/162466/2152/9313/4052/84894/64856/1191/51162/333/2263/1462/7052/2615/8076/1291/5265/51129/4321/4693/151887/3898/2267/1292/3914/1303/6678/145864/4312/54507/1289/1946/4319/1294/3371/5054/4016/64129/4316/3491/43/1277 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> GO:0000785 </td>
+   <td style="text-align:left;"> GO:0000785 </td>
+   <td style="text-align:left;"> chromatin </td>
+   <td style="text-align:right;"> 370 </td>
+   <td style="text-align:right;"> -0.4655319 </td>
+   <td style="text-align:right;"> -1.692696 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 754 </td>
+   <td style="text-align:left;"> tags=33%, list=15%, signal=30% </td>
+   <td style="text-align:left;"> 6659/6899/168620/367/56956/8193/5396/4778/5347/6097/25946/7005/3005/1746/3227/57801/4487/3199/688/6934/7029/3232/64919/3171/9355/283248/23462/5468/84913/26298/2623/2355/9096/6591/157848/93986/3195/4734/4783/55509/6096/3167/2103/4784/3238/64843/4086/221833/11240/8091/8335/2649/644168/83881/4776/4582/79191/4092/4610/3131/6474/5307/8013/3398/7052/5076/51513/3299/26038/6939/4781/338917/3206/10660/7003/2300/1482/3204/5308/55806/51804/9496/26468/860/90993/2018/253738/4211/23532/9242/1879/6604/5080/2303/4212/2016/10891/92815/1747/3237/2516/10265/4091/79776/3229/84667/1745/10481/5087/56938/2019/3236/10736/6913/2115/3235/6495/3234/5077/6662/3280/3226/2290 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="gene-ontology-analysis-4" class="slide level2 smaller">
+<h2>Gene Ontology Analysis</h2>
+<p>Saving the results to a file</p>
+<p>ORA GO analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_ora), </span>
+<span id="cb13-2"><a href="#cb13-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_ora_enriched.tsv"</span>), </span>
+<span id="cb13-3"><a href="#cb13-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>GSEA GO analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_gsea), </span>
+<span id="cb14-2"><a href="#cb14-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_gsea_enriched.tsv"</span>), </span>
+<span id="cb14-3"><a href="#cb14-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="gene-ontology-analysis-5" class="slide level2 smaller">
+<h2>Gene Ontology Analysis</h2>
+<p>Various options for visualising the results</p>
+<div class="columns">
+<div class="column" style="width:50%;">
+<ul>
+<li>Barplot</li>
+<li>Dotplot</li>
+<li>Heatmap</li>
+<li>Cnetplot</li>
+</ul>
+</div><div class="column" style="width:50%;">
+<p><br></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">barplot</span>(go_ora, <span class="at">showCategory=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<p><img data-src="ClusterProfiler_files/figure-revealjs/unnamed-chunk-21-1.png" width="960"></p>
+</div>
+</div>
+</div>
+</div>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>https://yulab-smu.top/biomedical-knowledge-mining-book/index.html</p>
+</div>
+</div></aside></section>
+<section id="pathway-analysis" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<p>Pathway analysis uses over representation and gene set enrichment analysis.<br>
+Can use several databases for pathway analysis:</p>
+<ul>
+<li>KEGG</li>
+<li>WikiPathways</li>
+<li>Reactome</li>
+</ul>
+</section>
+<section id="pathway-analysis-1" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<h3 id="wikipathways">WikiPathways</h3>
+<p>Continuously updated pathway database curated by a community of researchers.<br>
+Supported organisms:</p>
+<p><br></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code> [1] "Anopheles gambiae"        "Arabidopsis thaliana"    
+ [3] "Bos taurus"               "Caenorhabditis elegans"  
+ [5] "Canis familiaris"         "Danio rerio"             
+ [7] "Drosophila melanogaster"  "Equus caballus"          
+ [9] "Gallus gallus"            "Homo sapiens"            
+[11] "Mus musculus"             "Pan troglodytes"         
+[13] "Populus trichocarpa"      "Rattus norvegicus"       
+[15] "Saccharomyces cerevisiae" "Solanum lycopersicum"    
+[17] "Sus scrofa"               "Zea mays"                </code></pre>
+</div>
+</div>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>https://www.wikipathways.org</p>
+</div>
+</div></aside></section>
+<section id="pathway-analysis-2" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<h3 id="reactome">Reactome</h3>
+<p>Reactome is an open-source, open access, manually curated and peer-reviewed pathway database. Only implements over representation analysis.<br>
+Supported organisms:</p>
+<p><br></p>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "celegans"  "fly"       "human"     "mouse"     "rat"       "yeast"    
+[7] "zebrafish"</code></pre>
+</div>
+</div>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>G Yu, QY He*. ReactomePA: an R/Bioconductor package for reactome pathway analysis and visualization. Molecular BioSystems 2016, 12(2):477-479. doi: 10.1039/C5MB00663E</p>
+</div>
+</div></aside></section>
+<section id="pathway-analysis-3" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<h3 id="kegg">KEGG</h3>
+<p>Kyoto Encyclopedia of Genes and Genomes.</p>
+<p>Implements ORA and GSEA</p>
+<div class="cell">
+
+</div>
+<p>Supports a large number of organisms <strong>8137</strong>.</p>
+<p>Search using search_kegg_organism() command:</p>
+<div style="font-size: 75%;">
+<div class="cell">
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">search_kegg_organism</span>(<span class="st">"Mus musculus"</span>, <span class="at">by=</span><span class="st">'scientific_name'</span>) <span class="sc">%&gt;%</span> <span class="co"># Can also search using kegg_code or common_name</span></span>
+<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb18-3"><a href="#cb18-3"></a>  <span class="fu">kable_styling</span>(<span class="st">"condensed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> kegg_code </th>
+   <th style="text-align:left;"> scientific_name </th>
+   <th style="text-align:left;"> common_name </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> 22 </td>
+   <td style="text-align:left;"> mmu </td>
+   <td style="text-align:left;"> Mus musculus </td>
+   <td style="text-align:left;"> house mouse </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>Full list can be found here: http://www.genome.jp/kegg/catalog/org_list.html</p>
+</div>
+</div></aside></section>
+<section id="pathway-analysis-4" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<p>Over representation analysis</p>
+<ul>
+<li>Use de genes from the GO over representation analysis</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>kegg_ora <span class="ot">&lt;-</span> <span class="fu">enrichKEGG</span>(<span class="at">gene =</span> de_genes,</span>
+<span id="cb19-2"><a href="#cb19-2"></a>                       <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
+<span id="cb19-3"><a href="#cb19-3"></a>                       <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> ID </th>
+   <th style="text-align:left;"> Description </th>
+   <th style="text-align:left;"> GeneRatio </th>
+   <th style="text-align:left;"> BgRatio </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> p.adjust </th>
+   <th style="text-align:right;"> qvalue </th>
+   <th style="text-align:left;"> geneID </th>
+   <th style="text-align:right;"> Count </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> hsa04514 </td>
+   <td style="text-align:left;"> hsa04514 </td>
+   <td style="text-align:left;"> Cell adhesion molecules </td>
+   <td style="text-align:left;"> 82/2267 </td>
+   <td style="text-align:left;"> 158/8661 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0e+00 </td>
+   <td style="text-align:right;"> 0e+00 </td>
+   <td style="text-align:left;"> 959/3383/23308/5175/1493/3134/958/90952/6385/941/3695/3684/942/4756/5792/5818/3688/3384/50848/9379/26047/57555/923/23705/6382/214/965/29126/80380/3109/3683/5788/84628/22871/9069/3689/5802/1462/3655/57689/6383/5133/8506/3696/3135/3133/9369/22829/4897/925/3105/7412/3680/3107/94030/57502/1002/3123/3897/5817/137075/5819/926/3127/3106/22854/6614/23562/29851/57863/947/10666/4359/3108/100506658/999/6404/1366/3676/927/5797/23114 </td>
+   <td style="text-align:right;"> 82 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsa05414 </td>
+   <td style="text-align:left;"> hsa05414 </td>
+   <td style="text-align:left;"> Dilated cardiomyopathy </td>
+   <td style="text-align:left;"> 56/2267 </td>
+   <td style="text-align:left;"> 103/8661 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 2e-07 </td>
+   <td style="text-align:right;"> 1e-07 </td>
+   <td style="text-align:left;"> 71/7168/55799/3695/7040/112/3679/3688/3675/4000/776/783/784/1674/7124/5567/7139/7169/2778/3678/3655/3672/3908/6262/60/3696/1837/59284/7171/782/859/3680/93589/111/6645/4633/3693/109/153/8082/4624/59283/6546/6443/6547/27092/6641/107/7042/781/4634/115/3674/4625/3676/3691 </td>
+   <td style="text-align:right;"> 56 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsa04512 </td>
+   <td style="text-align:left;"> hsa04512 </td>
+   <td style="text-align:left;"> ECM-receptor interaction </td>
+   <td style="text-align:left;"> 50/2267 </td>
+   <td style="text-align:left;"> 89/8661 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 2e-07 </td>
+   <td style="text-align:right;"> 1e-07 </td>
+   <td style="text-align:left;"> 960/375790/6385/3695/1278/80144/1277/2335/3679/3688/3675/3911/3371/3912/22987/6382/3339/3678/3655/1291/3672/3908/3696/9899/1293/1311/3914/1292/2811/3680/7058/1287/3693/1284/7057/10319/3161/3918/7148/1280/6696/2814/7143/1285/341640/9900/3674/3676/3691/948 </td>
+   <td style="text-align:right;"> 50 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="pathway-analysis-5" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<p>Gene set enrichment analysis.</p>
+<ul>
+<li>Use de genes list from the GO gene set enrichment analysis</li>
+</ul>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>kegg_gsea <span class="ot">&lt;-</span> <span class="fu">gseKEGG</span>(<span class="at">geneList =</span> gsea_gene_list,</span>
+<span id="cb20-2"><a href="#cb20-2"></a>                     <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
+<span id="cb20-3"><a href="#cb20-3"></a>                     <span class="at">minGSSize =</span> <span class="dv">10</span>,</span>
+<span id="cb20-4"><a href="#cb20-4"></a>                     <span class="at">pvalueCutoff =</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;">   </th>
+   <th style="text-align:left;"> ID </th>
+   <th style="text-align:left;"> Description </th>
+   <th style="text-align:right;"> setSize </th>
+   <th style="text-align:right;"> enrichmentScore </th>
+   <th style="text-align:right;"> NES </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> p.adjust </th>
+   <th style="text-align:right;"> qvalue </th>
+   <th style="text-align:right;"> rank </th>
+   <th style="text-align:left;"> leading_edge </th>
+   <th style="text-align:left;"> core_enrichment </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> hsa04060 </td>
+   <td style="text-align:left;"> hsa04060 </td>
+   <td style="text-align:left;"> Cytokine-cytokine receptor interaction </td>
+   <td style="text-align:right;"> 108 </td>
+   <td style="text-align:right;"> -0.5141545 </td>
+   <td style="text-align:right;"> -1.806077 </td>
+   <td style="text-align:right;"> 0.0000006 </td>
+   <td style="text-align:right;"> 0.0001647 </td>
+   <td style="text-align:right;"> 0.0001434 </td>
+   <td style="text-align:right;"> 1049 </td>
+   <td style="text-align:left;"> tags=45%, list=21%, signal=37% </td>
+   <td style="text-align:left;"> 6352/3554/29949/3604/83729/1441/130399/3586/56300/8794/1233/6368/8784/8600/4804/6357/355/4049/27302/94/7850/3596/3597/8200/1271/3576/1438/6362/7293/6364/64109/7292/6363/959/3569/8792/3976/3553/10148/6346/3557/3552/6369/1437/3624/3593/6376/6367/6361 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsa05202 </td>
+   <td style="text-align:left;"> hsa05202 </td>
+   <td style="text-align:left;"> Transcriptional misregulation in cancer </td>
+   <td style="text-align:right;"> 82 </td>
+   <td style="text-align:right;"> -0.5233763 </td>
+   <td style="text-align:right;"> -1.805120 </td>
+   <td style="text-align:right;"> 0.0000032 </td>
+   <td style="text-align:right;"> 0.0004479 </td>
+   <td style="text-align:right;"> 0.0003901 </td>
+   <td style="text-align:right;"> 914 </td>
+   <td style="text-align:left;"> tags=44%, list=19%, signal=36% </td>
+   <td style="text-align:left;"> 10912/3002/942/598/7185/1848/64919/5154/4804/5468/85414/4914/7850/3195/4086/3728/8091/7704/5327/3576/5328/8013/3398/51513/3206/51804/5747/860/4211/3569/3207/5087/1437/2115/6495/5077 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> hsa03420 </td>
+   <td style="text-align:left;"> hsa03420 </td>
+   <td style="text-align:left;"> Nucleotide excision repair </td>
+   <td style="text-align:right;"> 11 </td>
+   <td style="text-align:right;"> 0.6577635 </td>
+   <td style="text-align:right;"> 2.449852 </td>
+   <td style="text-align:right;"> 0.0002891 </td>
+   <td style="text-align:right;"> 0.0267912 </td>
+   <td style="text-align:right;"> 0.0233319 </td>
+   <td style="text-align:right;"> 1292 </td>
+   <td style="text-align:left;"> tags=91%, list=26%, signal=67% </td>
+   <td style="text-align:left;"> 100533467/56655/7507/5441/3978/5111/7508/2074/54107/5983 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="pathway-analysis-6" class="slide level2 smaller">
+<h2>Pathway Analysis</h2>
+<p>Save the pathway analysis to file</p>
+<p>Over representation analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>kegg_ora <span class="sc">%&gt;%</span></span>
+<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb21-3"><a href="#cb21-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"ora_pathway.tsv"</span>),</span>
+<span id="cb21-4"><a href="#cb21-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Gene set enrichment analysis</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>kegg_gsea <span class="sc">%&gt;%</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"gsea_pathway.tsv"</span>),</span>
+<span id="cb22-4"><a href="#cb22-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pathway-analysis-visualisation" class="slide level2 smaller">
+<h2>Pathway Analysis Visualisation</h2>
+<p>Pathview is a tool set for pathway based data integration and visualization</p>
+<ul>
+<li>Input Kegg pathway id</li>
+<li>List of differentially expressed genes
+<ul>
+<li>names - entrez ids</li>
+<li>values - log fold changes</li>
+</ul></li>
+</ul>
+
+<aside><div>
+<div style="font-size: 75%;">
+<p>Luo, Weijun, and Cory Brouwer. 2013. “Pathview: An R/Bioconductor Package for Pathway-Based Data Integration and Visualization.” Bioinformatics 29 (July): 1830–31. https://doi.org/10.1093/bioinformatics/btt285.</p>
+</div>
+</div></aside></section>
+<section id="pathway-analysis-visualisation-1" class="slide level2 smaller">
+<h2>Pathway Analysis Visualisation</h2>
+<p>Create a function to retrieve the KEG pathways</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>kegg_pathview <span class="ot">&lt;-</span> <span class="cf">function</span>(kegg_pathway_id){</span>
+<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">pathview</span>(<span class="at">gene.data =</span> gsea_gene_list, <span class="co"># List of DE gene entrez ids and log fold changes</span></span>
+<span id="cb23-3"><a href="#cb23-3"></a>        <span class="at">pathway.id =</span> kegg_pathway_id, <span class="co"># KEGG pathway id to download and annotate</span></span>
+<span id="cb23-4"><a href="#cb23-4"></a>        <span class="at">species =</span> <span class="st">"hsa"</span>, <span class="co"># Organism KEGG id</span></span>
+<span id="cb23-5"><a href="#cb23-5"></a>        <span class="at">gene.idtype =</span> <span class="st">"KEGG"</span>, </span>
+<span id="cb23-6"><a href="#cb23-6"></a>        <span class="at">kegg.native =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb23-7"><a href="#cb23-7"></a>}</span>
+<span id="cb23-8"><a href="#cb23-8"></a></span>
+<span id="cb23-9"><a href="#cb23-9"></a>kegg_gsea_list <span class="ot">&lt;-</span> kegg_gsea <span class="sc">%&gt;%</span></span>
+<span id="cb23-10"><a href="#cb23-10"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb23-11"><a href="#cb23-11"></a>  <span class="fu">pull</span>(ID) </span>
+<span id="cb23-12"><a href="#cb23-12"></a><span class="fu">lapply</span>(kegg_gsea_list, kegg_pathview)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Tidy up the pathway files</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>results.files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"pathview.png"</span>) <span class="sc">%&gt;%</span> <span class="co"># list all pathview files</span></span>
+<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">file.copy</span>(results_directory) <span class="co"># Copy pathway files to results directory</span></span>
+<span id="cb24-3"><a href="#cb24-3"></a><span class="co"># Delete results files</span></span>
+<span id="cb24-4"><a href="#cb24-4"></a>remove_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"hsa"</span>) <span class="sc">%&gt;%</span> <span class="co"># List all files dowloaded from KEGG</span></span>
+<span id="cb24-5"><a href="#cb24-5"></a>  <span class="fu">file.remove</span>() <span class="co"># Delete the files</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="pathway-analysis-visualisation-2" class="slide level2 smaller">
+<h2>Pathway Analysis Visualisation</h2>
+
+<img data-src="ClusterProfiler/hsa05202.pathview.png" style="width:100.0%" class="r-stretch"><div class="footer footer-default">
+
+</div>
+</section>
+    </div>
+  </div>
+
+  <script>window.backupDefine = window.define; window.define = undefined;</script>
+  <script src="ClusterProfiler_files/libs/revealjs/dist/reveal.js"></script>
+  <!-- reveal.js plugins -->
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/pdf-export/pdfexport.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/reveal-menu/menu.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/reveal-menu/quarto-menu.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/quarto-support/support.js"></script>
+  
+
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/notes/notes.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/search/search.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/zoom/zoom.js"></script>
+  <script src="ClusterProfiler_files/libs/revealjs/plugin/math/math.js"></script>
+  <script>window.define = window.backupDefine; window.backupDefine = undefined;</script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://revealjs.com/config/
+      Reveal.initialize({
+'controlsAuto': true,
+'previewLinksAuto': false,
+'smaller': false,
+'pdfSeparateFragments': false,
+'autoAnimateEasing': "ease",
+'autoAnimateDuration': 1,
+'autoAnimateUnmatched': true,
+'menu': {"side":"left","useTextContentForMissingTitles":true,"markers":false,"loadIcons":false,"custom":[{"title":"Tools","icon":"<i class=\"fas fa-gear\"></i>","content":"<ul class=\"slide-menu-items\">\n<li class=\"slide-tool-item active\" data-item=\"0\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.fullscreen(event)\"><kbd>f</kbd> Fullscreen</a></li>\n<li class=\"slide-tool-item\" data-item=\"1\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.speakerMode(event)\"><kbd>s</kbd> Speaker View</a></li>\n<li class=\"slide-tool-item\" data-item=\"2\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>o</kbd> Slide Overview</a></li>\n<li class=\"slide-tool-item\" data-item=\"3\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.overview(event)\"><kbd>e</kbd> PDF Export Mode</a></li>\n<li class=\"slide-tool-item\" data-item=\"4\"><a href=\"#\" onclick=\"RevealMenuToolHandlers.keyboardHelp(event)\"><kbd>?</kbd> Keyboard Help</a></li>\n</ul>"}],"openButton":true},
+'smaller': false,
+ 
+        // Display controls in the bottom right corner
+        controls: false,
+
+        // Help the user learn the controls by providing hints, for example by
+        // bouncing the down arrow when they first encounter a vertical slide
+        controlsTutorial: false,
+
+        // Determines where controls appear, "edges" or "bottom-right"
+        controlsLayout: 'edges',
+
+        // Visibility rule for backwards navigation arrows; "faded", "hidden"
+        // or "visible"
+        controlsBackArrows: 'faded',
+
+        // Display a presentation progress bar
+        progress: true,
+
+        // Display the page number of the current slide
+        slideNumber: 'c/t',
+
+        // 'all', 'print', or 'speaker'
+        showSlideNumber: 'all',
+
+        // Add the current slide number to the URL hash so that reloading the
+        // page/copying the URL will return you to the same slide
+        hash: true,
+
+        // Start with 1 for the hash rather than 0
+        hashOneBasedIndex: false,
+
+        // Flags if we should monitor the hash and change slides accordingly
+        respondToHashChanges: true,
+
+        // Push each slide change to the browser history
+        history: true,
+
+        // Enable keyboard shortcuts for navigation
+        keyboard: true,
+
+        // Enable the slide overview mode
+        overview: true,
+
+        // Disables the default reveal.js slide layout (scaling and centering)
+        // so that you can use custom CSS layout
+        disableLayout: false,
+
+        // Vertical centering of slides
+        center: false,
+
+        // Enables touch navigation on devices with touch input
+        touch: true,
+
+        // Loop the presentation
+        loop: false,
+
+        // Change the presentation direction to be RTL
+        rtl: false,
+
+        // see https://revealjs.com/vertical-slides/#navigation-mode
+        navigationMode: 'linear',
+
+        // Randomizes the order of slides each time the presentation loads
+        shuffle: false,
+
+        // Turns fragments on and off globally
+        fragments: true,
+
+        // Flags whether to include the current fragment in the URL,
+        // so that reloading brings you to the same fragment position
+        fragmentInURL: false,
+
+        // Flags if the presentation is running in an embedded mode,
+        // i.e. contained within a limited portion of the screen
+        embedded: false,
+
+        // Flags if we should show a help overlay when the questionmark
+        // key is pressed
+        help: true,
+
+        // Flags if it should be possible to pause the presentation (blackout)
+        pause: true,
+
+        // Flags if speaker notes should be visible to all viewers
+        showNotes: false,
+
+        // Global override for autoplaying embedded media (null/true/false)
+        autoPlayMedia: null,
+
+        // Global override for preloading lazy-loaded iframes (null/true/false)
+        preloadIframes: null,
+
+        // Number of milliseconds between automatically proceeding to the
+        // next slide, disabled when set to 0, this value can be overwritten
+        // by using a data-autoslide attribute on your slides
+        autoSlide: 0,
+
+        // Stop auto-sliding after user input
+        autoSlideStoppable: true,
+
+        // Use this method for navigation when auto-sliding
+        autoSlideMethod: null,
+
+        // Specify the average time in seconds that you think you will spend
+        // presenting each slide. This is used to show a pacing timer in the
+        // speaker view
+        defaultTiming: null,
+
+        // Enable slide navigation via mouse wheel
+        mouseWheel: false,
+
+        // The display mode that will be used to show slides
+        display: 'block',
+
+        // Hide cursor if inactive
+        hideInactiveCursor: true,
+
+        // Time before the cursor is hidden (in ms)
+        hideCursorTime: 5000,
+
+        // Opens links in an iframe preview overlay
+        previewLinks: false,
+
+        // Transition style (none/fade/slide/convex/concave/zoom)
+        transition: 'none',
+
+        // Transition speed (default/fast/slow)
+        transitionSpeed: 'default',
+
+        // Transition style for full page slide backgrounds
+        // (none/fade/slide/convex/concave/zoom)
+        backgroundTransition: 'none',
+
+        // Number of slides away from the current that are visible
+        viewDistance: 3,
+
+        // Number of slides away from the current that are visible on mobile
+        // devices. It is advisable to set this to a lower number than
+        // viewDistance in order to save resources.
+        mobileViewDistance: 2,
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1050,
+
+        height: 700,
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+
+        math: {
+          mathjax: 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.0/MathJax.js',
+          config: 'TeX-AMS_HTML-full',
+          tex2jax: {
+            inlineMath: [['\\(','\\)']],
+            displayMath: [['\\[','\\]']],
+            balanceBraces: true,
+            processEscapes: false,
+            processRefs: true,
+            processEnvironments: true,
+            preview: 'TeX',
+            skipTags: ['script','noscript','style','textarea','pre','code'],
+            ignoreClass: 'tex2jax_ignore',
+            processClass: 'tex2jax_process'
+          },
+        },
+
+        // reveal.js plugins
+        plugins: [QuartoLineHighlight, PdfExport, RevealMenu, QuartoSupport,
+
+          RevealMath,
+          RevealNotes,
+          RevealSearch,
+          RevealZoom
+        ]
+      });
+    </script>
+    
+    <script>
+      // htmlwidgets need to know to resize themselves when slides are shown/hidden.
+      // Fire the "slideenter" event (handled by htmlwidgets.js) when the current
+      // slide changes (different for each slide format).
+      (function () {
+        // dispatch for htmlwidgets
+        function fireSlideEnter() {
+          const event = window.document.createEvent("Event");
+          event.initEvent("slideenter", true, true);
+          window.document.dispatchEvent(event);
+        }
+
+        function fireSlideChanged(previousSlide, currentSlide) {
+          fireSlideEnter();
+
+          // dispatch for shiny
+          if (window.jQuery) {
+            if (previousSlide) {
+              window.jQuery(previousSlide).trigger("hidden");
+            }
+            if (currentSlide) {
+              window.jQuery(currentSlide).trigger("shown");
+            }
+          }
+        }
+
+        // hookup for slidy
+        if (window.w3c_slidy) {
+          window.w3c_slidy.add_observer(function (slide_num) {
+            // slide_num starts at position 1
+            fireSlideChanged(null, w3c_slidy.slides[slide_num - 1]);
+          });
+        }
+
+      })();
+    </script>
+
+    <script id="quarto-html-after-body" type="application/javascript">
+    window.document.addEventListener("DOMContentLoaded", function (event) {
+      const toggleBodyColorMode = (bsSheetEl) => {
+        const mode = bsSheetEl.getAttribute("data-mode");
+        const bodyEl = window.document.querySelector("body");
+        if (mode === "dark") {
+          bodyEl.classList.add("quarto-dark");
+          bodyEl.classList.remove("quarto-light");
+        } else {
+          bodyEl.classList.add("quarto-light");
+          bodyEl.classList.remove("quarto-dark");
+        }
+      }
+      const toggleBodyColorPrimary = () => {
+        const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+        if (bsSheetEl) {
+          toggleBodyColorMode(bsSheetEl);
+        }
+      }
+      toggleBodyColorPrimary();  
+      const tabsets =  window.document.querySelectorAll(".panel-tabset-tabby")
+      tabsets.forEach(function(tabset) {
+        const tabby = new Tabby('#' + tabset.id);
+      });
+      const clipboard = new window.ClipboardJS('.code-copy-button', {
+        target: function(trigger) {
+          return trigger.previousElementSibling;
+        }
+      });
+      clipboard.on('success', function(e) {
+        // button target
+        const button = e.trigger;
+        // don't keep focus
+        button.blur();
+        // flash "checked"
+        button.classList.add('code-copy-button-checked');
+        var currentTitle = button.getAttribute("title");
+        button.setAttribute("title", "Copied!");
+        let tooltip;
+        if (window.bootstrap) {
+          button.setAttribute("data-bs-toggle", "tooltip");
+          button.setAttribute("data-bs-placement", "left");
+          button.setAttribute("data-bs-title", "Copied!");
+          tooltip = new bootstrap.Tooltip(button, 
+            { trigger: "manual", 
+              customClass: "code-copy-button-tooltip",
+              offset: [0, -8]});
+          tooltip.show();    
+        }
+        setTimeout(function() {
+          if (tooltip) {
+            tooltip.hide();
+            button.removeAttribute("data-bs-title");
+            button.removeAttribute("data-bs-toggle");
+            button.removeAttribute("data-bs-placement");
+          }
+          button.setAttribute("title", currentTitle);
+          button.classList.remove('code-copy-button-checked');
+        }, 1000);
+        // clear code selection
+        e.clearSelection();
+      });
+      function tippyHover(el, contentFn) {
+        const config = {
+          allowHTML: true,
+          content: contentFn,
+          maxWidth: 500,
+          delay: 100,
+          arrow: false,
+          appendTo: function(el) {
+              return el.closest('section.slide') || el.parentElement;
+          },
+          interactive: true,
+          interactiveBorder: 10,
+          theme: 'quarto-reveal',
+          placement: 'bottom-start'
+        };
+          config['offset'] = [0,0];
+          config['maxWidth'] = 700;
+        window.tippy(el, config); 
+      }
+      const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+      for (var i=0; i<noterefs.length; i++) {
+        const ref = noterefs[i];
+        tippyHover(ref, function() {
+          // use id or data attribute instead here
+          let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+          try { href = new URL(href).hash; } catch {}
+          const id = href.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          return note.innerHTML;
+        });
+      }
+      const findCites = (el) => {
+        const parentEl = el.parentElement;
+        if (parentEl) {
+          const cites = parentEl.dataset.cites;
+          if (cites) {
+            return {
+              el,
+              cites: cites.split(' ')
+            };
+          } else {
+            return findCites(el.parentElement)
+          }
+        } else {
+          return undefined;
+        }
+      };
+      var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+      for (var i=0; i<bibliorefs.length; i++) {
+        const ref = bibliorefs[i];
+        const citeInfo = findCites(ref);
+        if (citeInfo) {
+          tippyHover(citeInfo.el, function() {
+            var popup = window.document.createElement('div');
+            citeInfo.cites.forEach(function(cite) {
+              var citeDiv = window.document.createElement('div');
+              citeDiv.classList.add('hanging-indent');
+              citeDiv.classList.add('csl-entry');
+              var biblioDiv = window.document.getElementById('ref-' + cite);
+              if (biblioDiv) {
+                citeDiv.innerHTML = biblioDiv.innerHTML;
+              }
+              popup.appendChild(citeDiv);
+            });
+            return popup.innerHTML;
+          });
+        }
+      }
+    });
+    </script>
+    
+
+</body></html>
