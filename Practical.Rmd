@@ -1,0 +1,232 @@
+---
+title: "Functional Analysis Practical"
+output: html_document
+---
+## Instal & Load Required Pacakges
+### CRAN packages
+Install CRAN packages
+
+```{r}
+cran.packages <- c("tidyverse",
+                   "ggrepel",
+                   "kableExtra",
+                   "ggupset")
+
+cran.load <- function(pkg){
+        new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+        if (length(new.pkg)){
+          install.packages(new.pkg, dependencies = TRUE)
+          }
+        sapply(pkg, require, character.only = TRUE)
+}
+cran.load(cran.packages)
+```
+
+### Bioconductor Packages
+Install Biocondustor packages
+
+```{r}
+bioconductor.packages <- c("biomaRt",
+                           "org.Hs.eg.db",
+                           "clusterProfiler",
+                           "enrichplot",
+                           "pathview")
+
+bioconductor.load <- function(pkg){
+        new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+        if (length(new.pkg)){
+          if (!requireNamespace("BiocManager", quietly = TRUE))
+            install.packages("BiocManager")
+            BiocManager::install(new.pkg)
+        }
+        sapply(pkg, require, character.only = TRUE)
+}
+bioconductor.load(bioconductor.packages)
+```
+
+## Load Save Data
+Load the example results file, the data is in the ./data/ directory and called "Treatment_vs_Control.results.tsv". Note the use of the relative path. The "relative" path to the file is relative to the current working directory. Use the variable name "de_results". Complete the code chunk below.
+If you don't have the results file then you can get a copy from the data directory in this Session.
+
+```{r read in previous days results file}
+de_results <- 
+```
+
+## Annotations
+Using the example from the lecture slides get annotations from the Ensembl human database at Biomart. Replace the "..." with your code.
+```{r}
+database <- "hsapiens_gene_ensembl"
+mart <- "genes"
+filt <- "ensembl_gene_id"
+
+ensembl <- useEnsembl(...)
+
+att <- c("ensembl_gene_id","external_gene_name","chromosome_name","start_position","end_position","gene_biotype","entrezgene_id")
+
+annotations <- getBM(...) %>% 
+  distinct(ensembl_gene_id, .keep_all = TRUE)
+```
+
+Merge the annotations with the DESeq2 results
+```{r}
+de_results <- de_results %>%
+  left_join(...)%>% # merge annotations by ensembl gene id
+  arrange(...) # Sort the dataframe by the p adjusted value ascending
+```
+
+Save the annotated results to a file in the data directory, call the file "Treatment_vs_Control.annotated.results.tsv"
+```{r}
+
+```
+
+## Results Directory
+Create a results directory for the ClusterProfiler results files, I would call it "ClusterProfiler", but you can call it whatever you would like. 
+HINT: Code for this is in the lecture slides
+```{r}
+results_directory <- 
+```
+
+## Filtering
+Filter the results table for genes that have a p adjusted value of 0.1 and a log fold change of 1.
+NOTE: The use of the absolute value for the log2 fold change. Complete the code chunk below
+
+```{r}
+pvalueCutoff <- ... # P value
+qvalueCutoff <- ... # Adjusted P value
+foldchange <- ... # Fold change, usually fold change is log2
+```
+
+
+```{r}
+filtered_de_results <- de_results %>%
+  filter(...) %>% # Filter on p adjusted and the absolute values for the log fold change
+  drop_na() # Remove any NA values
+```
+
+## Gene Ontology Analysis
+### Over representation Analysis
+Extract a list of entrez ids for the differentially expressed genes, de_results. Use the pull() command from dplyr.  
+Complete the code chunk below
+```{r}
+de_genes <- filtered_de_results %>%
+  ...
+```
+
+
+Using the example in the lecture slides perform the over representation analysis
+```{r}
+go_ora <- enrichGO(gene = ...,
+                   OrgDb = ..., # Organism DB
+                   ont = ..., # Can choose "BP","CC", "MF" or "ALL"
+                   pAdjustMethod = ..., # Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+                   pvalueCutoff = ...,
+                   qvalueCutoff = ...,
+                   readable = TRUE)
+```
+
+### Gene Set enrichment Analysis
+
+Input is a named vector of log fold changes with entrez ids as the names, the list should be sorted on the log fold changes.  
+HINT: Example can be fould in the lecture slides.
+```{r}
+gsea_gene_list <- ... # Get the log fold values in a character vector
+names(gsea_gene_list) <- ... # Add the entrez gene ids as the names for the log fold changes
+gsea_gene_list <- ... # Sort the character vector bym logo fold change, for lowest to highest†
+```
+
+Using the example in the lecture slides perform the g ene set enrichment analysis
+```{r}
+#| echo: true
+#| eval: true
+go_gsea <- gseGO(gene = ..., # Add the gene list here
+                 OrgDb = ..., # Organism DB
+                 ont = ..., # Can choose BP,CC, MF or ALL
+                 pAdjustMethod = ..., # Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"
+                 minGSSize    = 100,
+                 maxGSSize    = 500,
+                 pvalueCutoff = ...)
+```
+
+
+Now save the Gene Ontology results to a file.
+
+```{r}
+write_delim(as.data.frame(go_ora), 
+            file = file.path(results_directory, "go_ora_enriched.tsv"), 
+            delim = "\t")
+```
+
+
+Now using the dotplot() command visualise the GO analysis results, You can limit the number of results using the parameter showCategory=10.
+
+```{r}
+
+```
+
+These visualisations are ggplot2 objects and can be saved using ggsave.
+
+## Pathway Analysis
+Over representation analysis
+Use the over represented gene list, de_genes, from above
+```{r}
+kegg_ora <- enrichKEGG(gene = ...,
+                       organism = ..., # Organism DB
+                       pvalueCutoff = 0.01)
+```
+
+Save the pathway analysis to file, name the file "ora_pathway.tsv"
+
+```{r}
+
+```
+
+## Pathway Analysis
+Gene set enrichment analysis using the named gene set list, gsea_gene_list, from above
+
+```{r}
+kegg_gsea <- gseKEGG(geneList = ...,
+                     organism = ..., # Organism DB
+                     minGSSize = 10,
+                     pvalueCutoff = 0.05)
+```
+
+Save the pathway analysis to file, name the file "gsea_pathway.tsv"
+
+```{r}
+
+```
+
+
+## Pathway Analysis Visualisation
+Using the function function to retrieve the KEG pathways.
+
+Get a list of KEGG path way ids, kegg_pathway_ids_list, from the kegg_gsea results and pass them thpo the function
+
+```{r}
+# Pathway visulaisation function
+kegg_pathview <- function(kegg_pathway_id){ 
+  pathview(gene.data = gsea_gene_list, # Named list of fold changes
+        pathway.id = kegg_pathway_id, # KEGG pathway id
+        species = "hsa", # KEG species id
+        gene.idtype = "KEGG",
+        kegg.native = TRUE) 
+}
+
+# List of KEGG pathway ids
+kegg_pathway_ids_list <- kegg_gsea %>%
+  ...
+
+# Iterate over the list of pathway ids and apply the data to the pathway
+lapply(kegg_pathway_ids_list, kegg_pathview)
+```
+
+
+You can use the code below to tidy up the KEGG pathway files
+```{r}
+results.files <- list.files(path = ".", pattern = "pathview.png") %>% # list all pathview files
+  file.copy(results_directory) # Copy pathway files to results directory
+# Delete results files
+remove_files <- list.files(path = ".", pattern = "hsa") %>% # List all files dowloaded from KEGG
+  file.remove() # Delete the files
+```
+

@@ -10,7 +10,7 @@
   <meta name="generator" content="quarto-1.2.269">
 
   <meta name="author" content="Graham Hamilton">
-  <title>Session 5: ClusterProfiler</title>
+  <title>Functional Analysis</title>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
@@ -391,7 +391,7 @@
     <div class="slides">
 
 <section id="title-slide" class="quarto-title-block center">
-  <h1 class="title">Session 5: ClusterProfiler</h1>
+  <h1 class="title">Functional Analysis</h1>
 
 <div class="quarto-title-authors">
 <div class="quarto-title-author">
@@ -409,6 +409,7 @@ Graham Hamilton
 <ul>
 <li>Loading packages</li>
 <li>Loading results from DESeq2</li>
+<li>Annotation</li>
 <li>Filtering results by fold change and adjusted p value</li>
 </ul>
 </div><div class="column" style="width:50%;">
@@ -490,20 +491,21 @@ Graham Hamilton
 <p>Install Biocondustor packages</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb2"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1"></a>bioconductor.packages <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"org.Hs.eg.db"</span>,</span>
-<span id="cb2-2"><a href="#cb2-2"></a>                           <span class="st">"clusterProfiler"</span>,</span>
-<span id="cb2-3"><a href="#cb2-3"></a>                           <span class="st">"enrichplot"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4"></a>                           <span class="st">"pathview"</span>)</span>
-<span id="cb2-5"><a href="#cb2-5"></a></span>
-<span id="cb2-6"><a href="#cb2-6"></a>bioconductor.load <span class="ot">&lt;-</span> <span class="cf">function</span>(pkg){</span>
-<span id="cb2-7"><a href="#cb2-7"></a>        new.pkg <span class="ot">&lt;-</span> pkg[<span class="sc">!</span>(pkg <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">"Package"</span>])]</span>
-<span id="cb2-8"><a href="#cb2-8"></a>        <span class="cf">if</span> (<span class="fu">length</span>(new.pkg)){</span>
-<span id="cb2-9"><a href="#cb2-9"></a>          <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
-<span id="cb2-10"><a href="#cb2-10"></a>            <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
-<span id="cb2-11"><a href="#cb2-11"></a>            BiocManager<span class="sc">::</span><span class="fu">install</span>(new.pkg)</span>
-<span id="cb2-12"><a href="#cb2-12"></a>        }</span>
-<span id="cb2-13"><a href="#cb2-13"></a>        <span class="fu">sapply</span>(pkg, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb2-14"><a href="#cb2-14"></a>}</span>
-<span id="cb2-15"><a href="#cb2-15"></a><span class="fu">bioconductor.load</span>(bioconductor.packages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb2-2"><a href="#cb2-2"></a>                           <span class="st">"biomaRt"</span>,</span>
+<span id="cb2-3"><a href="#cb2-3"></a>                           <span class="st">"clusterProfiler"</span>,</span>
+<span id="cb2-4"><a href="#cb2-4"></a>                           <span class="st">"enrichplot"</span>,</span>
+<span id="cb2-5"><a href="#cb2-5"></a>                           <span class="st">"pathview"</span>)</span>
+<span id="cb2-6"><a href="#cb2-6"></a></span>
+<span id="cb2-7"><a href="#cb2-7"></a>bioconductor.load <span class="ot">&lt;-</span> <span class="cf">function</span>(pkg){</span>
+<span id="cb2-8"><a href="#cb2-8"></a>        new.pkg <span class="ot">&lt;-</span> pkg[<span class="sc">!</span>(pkg <span class="sc">%in%</span> <span class="fu">installed.packages</span>()[, <span class="st">"Package"</span>])]</span>
+<span id="cb2-9"><a href="#cb2-9"></a>        <span class="cf">if</span> (<span class="fu">length</span>(new.pkg)){</span>
+<span id="cb2-10"><a href="#cb2-10"></a>          <span class="cf">if</span> (<span class="sc">!</span><span class="fu">requireNamespace</span>(<span class="st">"BiocManager"</span>, <span class="at">quietly =</span> <span class="cn">TRUE</span>))</span>
+<span id="cb2-11"><a href="#cb2-11"></a>            <span class="fu">install.packages</span>(<span class="st">"BiocManager"</span>)</span>
+<span id="cb2-12"><a href="#cb2-12"></a>            BiocManager<span class="sc">::</span><span class="fu">install</span>(new.pkg)</span>
+<span id="cb2-13"><a href="#cb2-13"></a>        }</span>
+<span id="cb2-14"><a href="#cb2-14"></a>        <span class="fu">sapply</span>(pkg, require, <span class="at">character.only =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb2-15"><a href="#cb2-15"></a>}</span>
+<span id="cb2-16"><a href="#cb2-16"></a><span class="fu">bioconductor.load</span>(bioconductor.packages)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="statistical-cut-off-values" class="slide level2">
@@ -515,12 +517,204 @@ Graham Hamilton
 <span id="cb3-3"><a href="#cb3-3"></a>foldchange <span class="ot">&lt;-</span> <span class="dv">1</span> <span class="co"># Fold change, usually fold change is log2</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
-<section id="load-previous-session-results" class="slide level2 smaller">
-<h2>Load Previous Session Results</h2>
-<p>Read in the results file from Session 4</p>
+<section id="load-results" class="slide level2 smaller">
+<h2>Load Results</h2>
+<p>Read in the results file from DESeq2 Analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>de_results <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"./data/Treatment_vs_Control.genes.tsv"</span>, </span>
+<div class="sourceCode cell-code" id="cb4"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1"></a>de_results <span class="ot">&lt;-</span> <span class="fu">read_delim</span>(<span class="st">"./data/Treatment_vs_Control_results.tsv"</span>, </span>
 <span id="cb4-2"><a href="#cb4-2"></a>                         <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div style="font-size: 80%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> ensembl_gene_id </th>
+   <th style="text-align:right;"> baseMean </th>
+   <th style="text-align:right;"> log2FoldChange </th>
+   <th style="text-align:right;"> lfcSE </th>
+   <th style="text-align:right;"> stat </th>
+   <th style="text-align:right;"> pvalue </th>
+   <th style="text-align:right;"> padj </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ENSG00000157191 </td>
+   <td style="text-align:right;"> 8171.718 </td>
+   <td style="text-align:right;"> -2.429669 </td>
+   <td style="text-align:right;"> 0.0374863 </td>
+   <td style="text-align:right;"> -64.81491 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000117090 </td>
+   <td style="text-align:right;"> 2322.100 </td>
+   <td style="text-align:right;"> -5.224265 </td>
+   <td style="text-align:right;"> 0.0775600 </td>
+   <td style="text-align:right;"> -67.35771 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000026751 </td>
+   <td style="text-align:right;"> 4495.926 </td>
+   <td style="text-align:right;"> -4.690935 </td>
+   <td style="text-align:right;"> 0.0870932 </td>
+   <td style="text-align:right;"> -53.86110 </td>
+   <td style="text-align:right;"> 0 </td>
+   <td style="text-align:right;"> 0 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><br></p>
+<p><strong>baseMean</strong> - mean of normalized counts for all samples<br>
+<strong>log2FoldChang</strong>e - log2 fold change (MAP): condition treated vs untreated<br>
+<strong>lfcSE</strong> - standard error: condition treated vs untreated<br>
+<strong>stat</strong> - Wald statistic: condition treated vs untreated<br>
+<strong>pvalue</strong> - Wald test p-value: condition treated vs untreated<br>
+<strong>padj</strong> - BH adjusted p-values</p>
+</section>
+<section id="annotations" class="slide level2 smaller">
+<h2>Annotations</h2>
+<p>The DESeq2 results file contains very little information about the genes.<br>
+Annotations can be added from the GFF3 file or form the Biomart data base.<br>
+Using the R package biomaRt we can access the data sets <br></p>
+<div class="cell">
+
+</div>
+<div style="font-size: 50%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> dataset </th>
+   <th style="text-align:left;"> description </th>
+   <th style="text-align:left;"> version </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> abrachyrhynchus_gene_ensembl </td>
+   <td style="text-align:left;"> Pink-footed goose genes (ASM259213v1) </td>
+   <td style="text-align:left;"> ASM259213v1 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> acalliptera_gene_ensembl </td>
+   <td style="text-align:left;"> Eastern happy genes (fAstCal1.2) </td>
+   <td style="text-align:left;"> fAstCal1.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> acarolinensis_gene_ensembl </td>
+   <td style="text-align:left;"> Green anole genes (AnoCar2.0v2) </td>
+   <td style="text-align:left;"> AnoCar2.0v2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> acchrysaetos_gene_ensembl </td>
+   <td style="text-align:left;"> Golden eagle genes (bAquChr1.2) </td>
+   <td style="text-align:left;"> bAquChr1.2 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> acitrinellus_gene_ensembl </td>
+   <td style="text-align:left;"> Midas cichlid genes (Midas_v5) </td>
+   <td style="text-align:left;"> Midas_v5 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+<p><br> There are <strong>214</strong> organism datasets in Biomart.</p>
+</section>
+<section id="annotations-1" class="slide level2 smaller">
+<h2>Annotations</h2>
+<p>Here we get annotations from the Ensembl human database at Biomart</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>database <span class="ot">&lt;-</span> <span class="st">"hsapiens_gene_ensembl"</span></span>
+<span id="cb5-2"><a href="#cb5-2"></a>mart <span class="ot">&lt;-</span> <span class="st">"genes"</span></span>
+<span id="cb5-3"><a href="#cb5-3"></a>filt <span class="ot">&lt;-</span> <span class="st">"ensembl_gene_id"</span></span>
+<span id="cb5-4"><a href="#cb5-4"></a></span>
+<span id="cb5-5"><a href="#cb5-5"></a>ensembl <span class="ot">&lt;-</span> <span class="fu">useEnsembl</span>(<span class="at">biomart =</span> mart, <span class="at">dataset =</span> database)</span>
+<span id="cb5-6"><a href="#cb5-6"></a></span>
+<span id="cb5-7"><a href="#cb5-7"></a>att <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"ensembl_gene_id"</span>,<span class="st">"external_gene_name"</span>,<span class="st">"chromosome_name"</span>,<span class="st">"start_position"</span>,<span class="st">"end_position"</span>,<span class="st">"gene_biotype"</span>,<span class="st">"entrezgene_id"</span>)</span>
+<span id="cb5-8"><a href="#cb5-8"></a></span>
+<span id="cb5-9"><a href="#cb5-9"></a>annotations <span class="ot">&lt;-</span> <span class="fu">getBM</span>(<span class="at">attributes=</span>att,<span class="at">filter=</span>filt,<span class="at">values=</span>de_results<span class="sc">$</span>ensembl_gene_id,<span class="at">mart=</span>ensembl) <span class="sc">%&gt;%</span> </span>
+<span id="cb5-10"><a href="#cb5-10"></a>  <span class="fu">distinct</span>(ensembl_gene_id, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="annotations-2" class="slide level2">
+<h2>Annotations</h2>
+<p><br></p>
+<div style="font-size: 40%;">
+<div class="cell">
+<div class="cell-output-display">
+
+<table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
+ <thead>
+  <tr>
+   <th style="text-align:left;"> ensembl_gene_id </th>
+   <th style="text-align:left;"> external_gene_name </th>
+   <th style="text-align:left;"> chromosome_name </th>
+   <th style="text-align:right;"> start_position </th>
+   <th style="text-align:right;"> end_position </th>
+   <th style="text-align:left;"> gene_biotype </th>
+   <th style="text-align:right;"> entrezgene_id </th>
+  </tr>
+ </thead>
+<tbody>
+  <tr>
+   <td style="text-align:left;"> ENSG00000000460 </td>
+   <td style="text-align:left;"> FIRRM </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 169662007 </td>
+   <td style="text-align:right;"> 169854080 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 55732 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000000938 </td>
+   <td style="text-align:left;"> FGR </td>
+   <td style="text-align:left;"> 1 </td>
+   <td style="text-align:right;"> 27612064 </td>
+   <td style="text-align:right;"> 27635185 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 2268 </td>
+  </tr>
+  <tr>
+   <td style="text-align:left;"> ENSG00000001084 </td>
+   <td style="text-align:left;"> GCLC </td>
+   <td style="text-align:left;"> 6 </td>
+   <td style="text-align:right;"> 53497341 </td>
+   <td style="text-align:right;"> 53616970 </td>
+   <td style="text-align:left;"> protein_coding </td>
+   <td style="text-align:right;"> 2729 </td>
+  </tr>
+</tbody>
+</table>
+
+</div>
+</div>
+</div>
+</section>
+<section id="add-annotations" class="slide level2">
+<h2>Add Annotations</h2>
+<p>The annotations can be merged with our results file</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>de_results <span class="ot">&lt;-</span> de_results <span class="sc">%&gt;%</span></span>
+<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">left_join</span>(annotations, <span class="at">by =</span> <span class="st">"ensembl_gene_id"</span>)<span class="sc">%&gt;%</span> <span class="co"># merge annotations by ensembl gene id</span></span>
+<span id="cb6-3"><a href="#cb6-3"></a>  <span class="fu">arrange</span>(padj) <span class="sc">%&gt;%</span> <span class="co"># Sort the dataframe by the p adjusted value ascending</span></span>
+<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">replace_na</span>(<span class="fu">list</span>(<span class="at">log2FoldChange =</span> <span class="fl">0.001</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -543,14 +737,6 @@ Graham Hamilton
    <th style="text-align:right;"> end_position </th>
    <th style="text-align:left;"> gene_biotype </th>
    <th style="text-align:right;"> entrezgene_id </th>
-   <th style="text-align:right;"> Control_1 </th>
-   <th style="text-align:right;"> Control_2 </th>
-   <th style="text-align:right;"> Control_3 </th>
-   <th style="text-align:right;"> Control_4 </th>
-   <th style="text-align:right;"> Treatment_1 </th>
-   <th style="text-align:right;"> Treatment_2 </th>
-   <th style="text-align:right;"> Treatment_3 </th>
-   <th style="text-align:right;"> Treatment_4 </th>
   </tr>
  </thead>
 <tbody>
@@ -568,14 +754,6 @@ Graham Hamilton
    <td style="text-align:right;"> 16460078 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 55707 </td>
-   <td style="text-align:right;"> 13556.481 </td>
-   <td style="text-align:right;"> 13858.745 </td>
-   <td style="text-align:right;"> 14103.125 </td>
-   <td style="text-align:right;"> 13621.526 </td>
-   <td style="text-align:right;"> 2555.7914 </td>
-   <td style="text-align:right;"> 2514.9013 </td>
-   <td style="text-align:right;"> 2576.0675 </td>
-   <td style="text-align:right;"> 2587.1079 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> ENSG00000117090 </td>
@@ -591,14 +769,6 @@ Graham Hamilton
    <td style="text-align:right;"> 160647044 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 6504 </td>
-   <td style="text-align:right;"> 4554.992 </td>
-   <td style="text-align:right;"> 4369.232 </td>
-   <td style="text-align:right;"> 4578.598 </td>
-   <td style="text-align:right;"> 4588.982 </td>
-   <td style="text-align:right;"> 118.6919 </td>
-   <td style="text-align:right;"> 125.4663 </td>
-   <td style="text-align:right;"> 127.4026 </td>
-   <td style="text-align:right;"> 113.4383 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> ENSG00000026751 </td>
@@ -614,14 +784,6 @@ Graham Hamilton
    <td style="text-align:right;"> 160754821 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 57823 </td>
-   <td style="text-align:right;"> 8364.751 </td>
-   <td style="text-align:right;"> 8424.900 </td>
-   <td style="text-align:right;"> 9178.086 </td>
-   <td style="text-align:right;"> 8659.389 </td>
-   <td style="text-align:right;"> 366.9206 </td>
-   <td style="text-align:right;"> 301.1190 </td>
-   <td style="text-align:right;"> 320.1741 </td>
-   <td style="text-align:right;"> 352.0674 </td>
   </tr>
 </tbody>
 </table>
@@ -634,19 +796,19 @@ Graham Hamilton
 <h2>Results Directory</h2>
 <p>Create a results directory for the ClusterProfiler results files</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1"></a>results_directory <span class="ot">&lt;-</span> <span class="st">"ClusterProfiler"</span></span>
-<span id="cb5-2"><a href="#cb5-2"></a><span class="fu">dir.create</span>(results_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>results_directory <span class="ot">&lt;-</span> <span class="st">"ClusterProfiler"</span></span>
+<span id="cb7-2"><a href="#cb7-2"></a><span class="fu">dir.create</span>(results_directory, <span class="at">showWarnings =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="filter" class="slide level2 smaller">
 <h2>Filter</h2>
-<p>Filter the results table for genes that have a p adjusted value of 0.1 and a log fold change of 1.</p>
+<p>Filter the results table for genes that have a p adjusted value of 0.1 and a log 2 fold change of 1.</p>
 <p><strong>NOTE:</strong> The use of the absolute value for the log2 fold change.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1"></a>filtered_de_results <span class="ot">&lt;-</span> de_results <span class="sc">%&gt;%</span></span>
-<span id="cb6-2"><a href="#cb6-2"></a>  <span class="fu">filter</span>(padj <span class="sc">&lt;</span> qvalueCutoff,</span>
-<span id="cb6-3"><a href="#cb6-3"></a>         <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> foldchange) <span class="sc">%&gt;%</span></span>
-<span id="cb6-4"><a href="#cb6-4"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb8"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1"></a>filtered_de_results <span class="ot">&lt;-</span> de_results <span class="sc">%&gt;%</span></span>
+<span id="cb8-2"><a href="#cb8-2"></a>  <span class="fu">filter</span>(padj <span class="sc">&lt;</span> qvalueCutoff,</span>
+<span id="cb8-3"><a href="#cb8-3"></a>         <span class="fu">abs</span>(log2FoldChange) <span class="sc">&gt;</span> foldchange) <span class="sc">%&gt;%</span></span>
+<span id="cb8-4"><a href="#cb8-4"></a>  <span class="fu">drop_na</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -669,14 +831,6 @@ Graham Hamilton
    <th style="text-align:right;"> end_position </th>
    <th style="text-align:left;"> gene_biotype </th>
    <th style="text-align:right;"> entrezgene_id </th>
-   <th style="text-align:right;"> Control_1 </th>
-   <th style="text-align:right;"> Control_2 </th>
-   <th style="text-align:right;"> Control_3 </th>
-   <th style="text-align:right;"> Control_4 </th>
-   <th style="text-align:right;"> Treatment_1 </th>
-   <th style="text-align:right;"> Treatment_2 </th>
-   <th style="text-align:right;"> Treatment_3 </th>
-   <th style="text-align:right;"> Treatment_4 </th>
   </tr>
  </thead>
 <tbody>
@@ -694,14 +848,6 @@ Graham Hamilton
    <td style="text-align:right;"> 16460078 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 55707 </td>
-   <td style="text-align:right;"> 13556.481 </td>
-   <td style="text-align:right;"> 13858.745 </td>
-   <td style="text-align:right;"> 14103.125 </td>
-   <td style="text-align:right;"> 13621.526 </td>
-   <td style="text-align:right;"> 2555.7914 </td>
-   <td style="text-align:right;"> 2514.9013 </td>
-   <td style="text-align:right;"> 2576.0675 </td>
-   <td style="text-align:right;"> 2587.1079 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> ENSG00000117090 </td>
@@ -717,14 +863,6 @@ Graham Hamilton
    <td style="text-align:right;"> 160647044 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 6504 </td>
-   <td style="text-align:right;"> 4554.992 </td>
-   <td style="text-align:right;"> 4369.232 </td>
-   <td style="text-align:right;"> 4578.598 </td>
-   <td style="text-align:right;"> 4588.982 </td>
-   <td style="text-align:right;"> 118.6919 </td>
-   <td style="text-align:right;"> 125.4663 </td>
-   <td style="text-align:right;"> 127.4026 </td>
-   <td style="text-align:right;"> 113.4383 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> ENSG00000026751 </td>
@@ -740,14 +878,6 @@ Graham Hamilton
    <td style="text-align:right;"> 160754821 </td>
    <td style="text-align:left;"> protein_coding </td>
    <td style="text-align:right;"> 57823 </td>
-   <td style="text-align:right;"> 8364.751 </td>
-   <td style="text-align:right;"> 8424.900 </td>
-   <td style="text-align:right;"> 9178.086 </td>
-   <td style="text-align:right;"> 8659.389 </td>
-   <td style="text-align:right;"> 366.9206 </td>
-   <td style="text-align:right;"> 301.1190 </td>
-   <td style="text-align:right;"> 320.1741 </td>
-   <td style="text-align:right;"> 352.0674 </td>
   </tr>
 </tbody>
 </table>
@@ -755,7 +885,7 @@ Graham Hamilton
 </div>
 </div>
 </div>
-<p>There are <strong>4940</strong> genes remaining after filtering.</p>
+<p>There are <strong>4954</strong> genes remaining after filtering.</p>
 </section>
 <section id="gene-ontology" class="slide level2 smaller">
 <h2>Gene Ontology</h2>
@@ -789,24 +919,29 @@ Graham Hamilton
 </ul>
 <p>Example - 57 genes were differentially expressed out of a total of 17,980. Among the differentially expressed genes, 28 are annotated to a gene set</p>
 <div class="cell">
+<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>d <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(<span class="at">genes_not_differentially_expressed=</span><span class="fu">c</span>(<span class="dv">2613</span>, <span class="dv">15310</span>), <span class="at">genes_differentially_expressed=</span><span class="fu">c</span>(<span class="dv">28</span>, <span class="dv">29</span>))</span>
+<span id="cb9-2"><a href="#cb9-2"></a><span class="fu">row.names</span>(d) <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"In_GO_term"</span>, <span class="st">"Not_in_GO_term"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><br></p>
+<div class="cell">
 <div class="cell-output-display">
 
 <table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
  <thead>
   <tr>
    <th style="text-align:left;">   </th>
-   <th style="text-align:right;"> gene.not.interest </th>
-   <th style="text-align:right;"> gene.in.interest </th>
+   <th style="text-align:right;"> genes_not_differentially_expressed </th>
+   <th style="text-align:right;"> genes_differentially_expressed </th>
   </tr>
  </thead>
 <tbody>
   <tr>
-   <td style="text-align:left;"> In_category </td>
+   <td style="text-align:left;"> In_GO_term </td>
    <td style="text-align:right;"> 2613 </td>
    <td style="text-align:right;"> 28 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> not_in_category </td>
+   <td style="text-align:left;"> Not_in_GO_term </td>
    <td style="text-align:right;"> 15310 </td>
    <td style="text-align:right;"> 29 </td>
   </tr>
@@ -815,8 +950,9 @@ Graham Hamilton
 
 </div>
 </div>
+<p><br></p>
 <div class="cell">
-
+<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>f_test <span class="ot">&lt;-</span> <span class="fu">fisher.test</span>(d)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Test significance using hypergeometric distribution, one-sided Fisher’s exact test. The un-corrected P value <strong>7.879194e-10</strong></p>
 </div>
@@ -848,8 +984,8 @@ Graham Hamilton
 <p>Over representation analysis</p>
 <p>List of entrez ids for the differentially expressed genes, using the <strong>pull()</strong> command from dplyr</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb7"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1"></a>de_genes <span class="ot">&lt;-</span> filtered_de_results <span class="sc">%&gt;%</span></span>
-<span id="cb7-2"><a href="#cb7-2"></a>  <span class="fu">pull</span>(entrezgene_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb11"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1"></a>de_genes <span class="ot">&lt;-</span> filtered_de_results <span class="sc">%&gt;%</span></span>
+<span id="cb11-2"><a href="#cb11-2"></a>  <span class="fu">pull</span>(entrezgene_id)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
@@ -862,13 +998,13 @@ Graham Hamilton
 <h2>Gene Ontology Analysis</h2>
 <p>Over representation analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb9"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1"></a>go_ora <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(<span class="at">gene =</span> de_genes,</span>
-<span id="cb9-2"><a href="#cb9-2"></a>                   <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
-<span id="cb9-3"><a href="#cb9-3"></a>                   <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose "BP","CC", "MF" or "ALL"</span></span>
-<span id="cb9-4"><a href="#cb9-4"></a>                   <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
-<span id="cb9-5"><a href="#cb9-5"></a>                   <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>,</span>
-<span id="cb9-6"><a href="#cb9-6"></a>                   <span class="at">qvalueCutoff =</span> <span class="fl">0.05</span>,</span>
-<span id="cb9-7"><a href="#cb9-7"></a>                   <span class="at">readable =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a>go_ora <span class="ot">&lt;-</span> <span class="fu">enrichGO</span>(<span class="at">gene =</span> de_genes,</span>
+<span id="cb13-2"><a href="#cb13-2"></a>                   <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
+<span id="cb13-3"><a href="#cb13-3"></a>                   <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose "BP","CC", "MF" or "ALL"</span></span>
+<span id="cb13-4"><a href="#cb13-4"></a>                   <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
+<span id="cb13-5"><a href="#cb13-5"></a>                   <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>,</span>
+<span id="cb13-6"><a href="#cb13-6"></a>                   <span class="at">qvalueCutoff =</span> <span class="fl">0.05</span>,</span>
+<span id="cb13-7"><a href="#cb13-7"></a>                   <span class="at">readable =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -895,7 +1031,7 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0005925 </td>
    <td style="text-align:left;"> GO:0005925 </td>
    <td style="text-align:left;"> focal adhesion </td>
-   <td style="text-align:left;"> 169/4702 </td>
+   <td style="text-align:left;"> 169/4681 </td>
    <td style="text-align:left;"> 422/19869 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
@@ -907,7 +1043,7 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0030055 </td>
    <td style="text-align:left;"> GO:0030055 </td>
    <td style="text-align:left;"> cell-substrate junction </td>
-   <td style="text-align:left;"> 172/4702 </td>
+   <td style="text-align:left;"> 172/4681 </td>
    <td style="text-align:left;"> 432/19869 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
@@ -919,12 +1055,12 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0045121 </td>
    <td style="text-align:left;"> GO:0045121 </td>
    <td style="text-align:left;"> membrane raft </td>
-   <td style="text-align:left;"> 135/4702 </td>
+   <td style="text-align:left;"> 135/4681 </td>
    <td style="text-align:left;"> 326/19869 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:left;"> SRC/PTK2B/RFTN1/CD24/FAS/ICAM1/CAVIN1/LAT2/PECAM1/LCK/PGK1/PRKAR2B/CFLAR/MYOF/VDAC1/HMOX1/MYO1C/SDC4/KCNA3/PLLP/GPC1/TUBB/BST2/ITGAM/PPT1/TGFBR2/LRRK2/CLN6/BIRC2/ITGB1/RIPK1/SMO/TRADD/ENO2/CAV1/EFNA5/DPP4/CD55/GJA1/ARID3A/CRK/LRP4/TNF/LRP6/RTN4RL1/CARD11/EHD2/SPRED1/SERPINH1/ATP1B1/SLC9A1/FAIM2/SMPD2/ANGPT1/SCARB1/EPHB1/ADTRP/AKAP6/HCK/S100A10/ABCB4/STOML1/RET/ATP2B4/PTPRC/CD79A/TRAF2/CXADR/IRS1/SORBS1/ATP1A4/ITGB2/ADRA1B/EFNB1/SLC1A2/ITGA1/LRP8/SLC6A4/RGMB/MAL/CHRNA7/OLR1/SYNJ2/MYADM/CD8A/CAV3/FYN/PLPP3/CD19/FXYD1/INSR/CDH13/GABBR1/ATP1A2/LAT/S1PR1/MAPT/CR1/UNC5A/PTGS2/TFPI/KCNQ1/OPRD1/CHRNB2/CAVIN3/NOS1AP/F2R/ADCY1/STOM/MLC1/TNR/DLC1/TRPM8/ATP2B2/KCND2/ARC/MALL/EMP2/NFAM1/CD226/LY6K/OPRM1/PAG1/ADGRG1/CDH1/SELPLG/ABCG2/NTSR1/ADD2/TEX101/CD36/PTGIS/KCNE1/CAV2/FASLG </td>
+   <td style="text-align:left;"> SRC/PTK2B/RFTN1/CD24/FAS/ICAM1/CAVIN1/LAT2/PECAM1/LCK/PGK1/PRKAR2B/CFLAR/MYOF/VDAC1/HMOX1/MYO1C/SDC4/KCNA3/PLLP/GPC1/TUBB/BST2/ITGAM/PPT1/TGFBR2/LRRK2/CLN6/BIRC2/ITGB1/RIPK1/SMO/TRADD/ENO2/CAV1/EFNA5/DPP4/CD55/GJA1/ARID3A/CRK/LRP4/TNF/LRP6/RTN4RL1/CARD11/EHD2/SPRED1/SERPINH1/ATP1B1/SLC9A1/FAIM2/SMPD2/ANGPT1/SCARB1/EPHB1/ADTRP/AKAP6/HCK/S100A10/ABCB4/STOML1/RET/ATP2B4/PTPRC/CD79A/TRAF2/CXADR/IRS1/SORBS1/ATP1A4/ITGB2/ADRA1B/EFNB1/SLC1A2/ITGA1/LRP8/SLC6A4/RGMB/MAL/CHRNA7/OLR1/SYNJ2/MYADM/CD8A/CAV3/FYN/PLPP3/CD19/FXYD1/INSR/CDH13/GABBR1/ATP1A2/LAT/S1PR1/MAPT/CR1/UNC5A/PTGS2/TFPI/KCNQ1/OPRD1/CHRNB2/CAVIN3/NOS1AP/F2R/ADCY1/STOM/MLC1/TNR/DLC1/TRPM8/ATP2B2/KCND2/ARC/EMP2/NFAM1/CD226/LY6K/OPRM1/PAG1/ADGRG1/CDH1/SELPLG/ABCG2/NTSR1/ADD2/TEX101/CD36/PTGIS/PSEN2/KCNE1/CAV2/FASLG </td>
    <td style="text-align:right;"> 135 </td>
   </tr>
 </tbody>
@@ -939,9 +1075,9 @@ Graham Hamilton
 <p>Gene set enrichment analysis</p>
 <p>Input is a named vector of log fold changes with entrez ids as the names, sorted</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb10"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1"></a>gsea_gene_list <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>log2FoldChange</span>
-<span id="cb10-2"><a href="#cb10-2"></a><span class="fu">names</span>(gsea_gene_list) <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>entrezgene_id</span>
-<span id="cb10-3"><a href="#cb10-3"></a>gsea_gene_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(gsea_gene_list, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>gsea_gene_list <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>log2FoldChange</span>
+<span id="cb14-2"><a href="#cb14-2"></a><span class="fu">names</span>(gsea_gene_list) <span class="ot">&lt;-</span> filtered_de_results<span class="sc">$</span>entrezgene_id</span>
+<span id="cb14-3"><a href="#cb14-3"></a>gsea_gene_list <span class="ot">&lt;-</span> <span class="fu">sort</span>(gsea_gene_list, <span class="at">decreasing =</span> <span class="cn">TRUE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div class="cell">
@@ -955,13 +1091,13 @@ Graham Hamilton
 <h2>Gene Ontology Analysis</h2>
 <p>Gene set enrichment analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb12"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1"></a>go_gsea <span class="ot">&lt;-</span> <span class="fu">gseGO</span>(<span class="at">gene =</span> gsea_gene_list,</span>
-<span id="cb12-2"><a href="#cb12-2"></a>                 <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
-<span id="cb12-3"><a href="#cb12-3"></a>                 <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose BP,CC, MF or ALL</span></span>
-<span id="cb12-4"><a href="#cb12-4"></a>                 <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
-<span id="cb12-5"><a href="#cb12-5"></a>                 <span class="at">minGSSize    =</span> <span class="dv">100</span>,</span>
-<span id="cb12-6"><a href="#cb12-6"></a>                 <span class="at">maxGSSize    =</span> <span class="dv">500</span>,</span>
-<span id="cb12-7"><a href="#cb12-7"></a>                 <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb16"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1"></a>go_gsea <span class="ot">&lt;-</span> <span class="fu">gseGO</span>(<span class="at">gene =</span> gsea_gene_list,</span>
+<span id="cb16-2"><a href="#cb16-2"></a>                 <span class="at">OrgDb =</span> org.Hs.eg.db,</span>
+<span id="cb16-3"><a href="#cb16-3"></a>                 <span class="at">ont =</span> <span class="st">"CC"</span>, <span class="co"># Can choose BP,CC, MF or ALL</span></span>
+<span id="cb16-4"><a href="#cb16-4"></a>                 <span class="at">pAdjustMethod =</span> <span class="st">"BH"</span>, <span class="co"># Can choose "holm", "hochberg", "hommel", "bonferroni", "BH", "BY", "fdr", "none"</span></span>
+<span id="cb16-5"><a href="#cb16-5"></a>                 <span class="at">minGSSize    =</span> <span class="dv">100</span>,</span>
+<span id="cb16-6"><a href="#cb16-6"></a>                 <span class="at">maxGSSize    =</span> <span class="dv">500</span>,</span>
+<span id="cb16-7"><a href="#cb16-7"></a>                 <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -990,13 +1126,13 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0031012 </td>
    <td style="text-align:left;"> GO:0031012 </td>
    <td style="text-align:left;"> extracellular matrix </td>
-   <td style="text-align:right;"> 194 </td>
-   <td style="text-align:right;"> -0.5084959 </td>
-   <td style="text-align:right;"> -1.811140 </td>
+   <td style="text-align:right;"> 193 </td>
+   <td style="text-align:right;"> -0.5123197 </td>
+   <td style="text-align:right;"> -1.830920 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1145 </td>
+   <td style="text-align:right;"> 1148 </td>
    <td style="text-align:left;"> tags=49%, list=23%, signal=39% </td>
    <td style="text-align:left;"> 5199/9423/121227/4185/81794/23671/89797/85301/9508/7474/2/7098/2201/2199/146760/2811/176/1463/27299/63827/30008/83729/2335/26033/375790/50509/2239/59/84034/3918/4015/8482/284/1280/9719/8785/3697/2161/6383/5155/129080/3383/1307/5654/64499/5269/80760/4313/7177/129804/1311/54361/84171/3912/162466/2152/9313/4052/84894/64856/1191/51162/333/2263/1462/7052/2615/8076/1291/5265/51129/4321/4693/151887/3898/2267/1292/3914/1303/6678/145864/4312/54507/1289/1946/4319/1294/3371/5054/4016/64129/4316/3491/43/1277 </td>
   </tr>
@@ -1004,13 +1140,13 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0030312 </td>
    <td style="text-align:left;"> GO:0030312 </td>
    <td style="text-align:left;"> external encapsulating structure </td>
-   <td style="text-align:right;"> 195 </td>
-   <td style="text-align:right;"> -0.5068103 </td>
-   <td style="text-align:right;"> -1.805493 </td>
+   <td style="text-align:right;"> 194 </td>
+   <td style="text-align:right;"> -0.5106174 </td>
+   <td style="text-align:right;"> -1.824097 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 1145 </td>
+   <td style="text-align:right;"> 1148 </td>
    <td style="text-align:left;"> tags=49%, list=23%, signal=39% </td>
    <td style="text-align:left;"> 5199/9423/121227/4185/81794/23671/89797/85301/9508/7474/2/7098/2201/2199/146760/2811/176/1463/27299/63827/30008/83729/2335/26033/375790/50509/2239/59/84034/3918/4015/8482/284/1280/9719/8785/3697/2161/6383/5155/129080/3383/1307/5654/64499/5269/80760/4313/7177/129804/1311/54361/84171/3912/162466/2152/9313/4052/84894/64856/1191/51162/333/2263/1462/7052/2615/8076/1291/5265/51129/4321/4693/151887/3898/2267/1292/3914/1303/6678/145864/4312/54507/1289/1946/4319/1294/3371/5054/4016/64129/4316/3491/43/1277 </td>
   </tr>
@@ -1018,14 +1154,14 @@ Graham Hamilton
    <td style="text-align:left;"> GO:0000785 </td>
    <td style="text-align:left;"> GO:0000785 </td>
    <td style="text-align:left;"> chromatin </td>
-   <td style="text-align:right;"> 370 </td>
-   <td style="text-align:right;"> -0.4655319 </td>
-   <td style="text-align:right;"> -1.692696 </td>
+   <td style="text-align:right;"> 369 </td>
+   <td style="text-align:right;"> -0.4663016 </td>
+   <td style="text-align:right;"> -1.697763 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 754 </td>
-   <td style="text-align:left;"> tags=33%, list=15%, signal=30% </td>
+   <td style="text-align:right;"> 757 </td>
+   <td style="text-align:left;"> tags=33%, list=15%, signal=31% </td>
    <td style="text-align:left;"> 6659/6899/168620/367/56956/8193/5396/4778/5347/6097/25946/7005/3005/1746/3227/57801/4487/3199/688/6934/7029/3232/64919/3171/9355/283248/23462/5468/84913/26298/2623/2355/9096/6591/157848/93986/3195/4734/4783/55509/6096/3167/2103/4784/3238/64843/4086/221833/11240/8091/8335/2649/644168/83881/4776/4582/79191/4092/4610/3131/6474/5307/8013/3398/7052/5076/51513/3299/26038/6939/4781/338917/3206/10660/7003/2300/1482/3204/5308/55806/51804/9496/26468/860/90993/2018/253738/4211/23532/9242/1879/6604/5080/2303/4212/2016/10891/92815/1747/3237/2516/10265/4091/79776/3229/84667/1745/10481/5087/56938/2019/3236/10736/6913/2115/3235/6495/3234/5077/6662/3280/3226/2290 </td>
   </tr>
 </tbody>
@@ -1040,15 +1176,15 @@ Graham Hamilton
 <p>Saving the results to a file</p>
 <p>ORA GO analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb13"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_ora), </span>
-<span id="cb13-2"><a href="#cb13-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_ora_enriched.tsv"</span>), </span>
-<span id="cb13-3"><a href="#cb13-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb17"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_ora), </span>
+<span id="cb17-2"><a href="#cb17-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_ora_enriched.tsv"</span>), </span>
+<span id="cb17-3"><a href="#cb17-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>GSEA GO analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb14"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_gsea), </span>
-<span id="cb14-2"><a href="#cb14-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_gsea_enriched.tsv"</span>), </span>
-<span id="cb14-3"><a href="#cb14-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">write_delim</span>(<span class="fu">as.data.frame</span>(go_gsea), </span>
+<span id="cb18-2"><a href="#cb18-2"></a>            <span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"go_gsea_enriched.tsv"</span>), </span>
+<span id="cb18-3"><a href="#cb18-3"></a>            <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="gene-ontology-analysis-5" class="slide level2 smaller">
@@ -1065,9 +1201,9 @@ Graham Hamilton
 </div><div class="column" style="width:50%;">
 <p><br></p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb15"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1"></a><span class="fu">barplot</span>(go_ora, <span class="at">showCategory=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a><span class="fu">barplot</span>(go_ora, <span class="at">showCategory=</span><span class="dv">10</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
-<p><img data-src="ClusterProfiler_files/figure-revealjs/unnamed-chunk-21-1.png" width="960"></p>
+<p><img data-src="ClusterProfiler_files/figure-revealjs/unnamed-chunk-27-1.png" width="960"></p>
 </div>
 </div>
 </div>
@@ -1143,9 +1279,9 @@ Supported organisms:</p>
 <p>Search using search_kegg_organism() command:</p>
 <div style="font-size: 75%;">
 <div class="cell">
-<div class="sourceCode cell-code" id="cb18"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1"></a><span class="fu">search_kegg_organism</span>(<span class="st">"Mus musculus"</span>, <span class="at">by=</span><span class="st">'scientific_name'</span>) <span class="sc">%&gt;%</span> <span class="co"># Can also search using kegg_code or common_name</span></span>
-<span id="cb18-2"><a href="#cb18-2"></a>  <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb18-3"><a href="#cb18-3"></a>  <span class="fu">kable_styling</span>(<span class="st">"condensed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a><span class="fu">search_kegg_organism</span>(<span class="st">"Mus musculus"</span>, <span class="at">by=</span><span class="st">"scientific_name"</span>) <span class="sc">%&gt;%</span> <span class="co"># Can also search using kegg_code or common_name</span></span>
+<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">kbl</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">kable_styling</span>(<span class="st">"condensed"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 
 <table class="table table-condensed" style="margin-left: auto; margin-right: auto;">
@@ -1183,9 +1319,9 @@ Supported organisms:</p>
 <li>Use de genes from the GO over representation analysis</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb19"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1"></a>kegg_ora <span class="ot">&lt;-</span> <span class="fu">enrichKEGG</span>(<span class="at">gene =</span> de_genes,</span>
-<span id="cb19-2"><a href="#cb19-2"></a>                       <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
-<span id="cb19-3"><a href="#cb19-3"></a>                       <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>kegg_ora <span class="ot">&lt;-</span> <span class="fu">enrichKEGG</span>(<span class="at">gene =</span> de_genes,</span>
+<span id="cb23-2"><a href="#cb23-2"></a>                       <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
+<span id="cb23-3"><a href="#cb23-3"></a>                       <span class="at">pvalueCutoff =</span> <span class="fl">0.01</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -1212,37 +1348,37 @@ Supported organisms:</p>
    <td style="text-align:left;"> hsa04514 </td>
    <td style="text-align:left;"> hsa04514 </td>
    <td style="text-align:left;"> Cell adhesion molecules </td>
-   <td style="text-align:left;"> 82/2267 </td>
-   <td style="text-align:left;"> 158/8661 </td>
+   <td style="text-align:left;"> 82/2265 </td>
+   <td style="text-align:left;"> 158/8662 </td>
    <td style="text-align:right;"> 0 </td>
    <td style="text-align:right;"> 0e+00 </td>
    <td style="text-align:right;"> 0e+00 </td>
-   <td style="text-align:left;"> 959/3383/23308/5175/1493/3134/958/90952/6385/941/3695/3684/942/4756/5792/5818/3688/3384/50848/9379/26047/57555/923/23705/6382/214/965/29126/80380/3109/3683/5788/84628/22871/9069/3689/5802/1462/3655/57689/6383/5133/8506/3696/3135/3133/9369/22829/4897/925/3105/7412/3680/3107/94030/57502/1002/3123/3897/5817/137075/5819/926/3127/3106/22854/6614/23562/29851/57863/947/10666/4359/3108/100506658/999/6404/1366/3676/927/5797/23114 </td>
+   <td style="text-align:left;"> 959/3383/102723996/5175/1493/3134/958/90952/6385/941/3695/3684/942/4756/5792/5818/3688/3384/50848/9379/26047/57555/923/23705/6382/214/965/29126/80380/3109/3683/5788/84628/22871/9069/3689/5802/1462/3655/57689/6383/5133/8506/3696/3135/3133/9369/22829/4897/925/3105/7412/3680/3107/94030/57502/1002/3123/3897/5817/137075/5819/926/3127/3106/22854/6614/23562/29851/57863/947/10666/4359/3108/100506658/999/6404/1366/3676/927/5797/23114 </td>
    <td style="text-align:right;"> 82 </td>
   </tr>
   <tr>
    <td style="text-align:left;"> hsa05414 </td>
    <td style="text-align:left;"> hsa05414 </td>
    <td style="text-align:left;"> Dilated cardiomyopathy </td>
-   <td style="text-align:left;"> 56/2267 </td>
-   <td style="text-align:left;"> 103/8661 </td>
+   <td style="text-align:left;"> 57/2265 </td>
+   <td style="text-align:left;"> 103/8662 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 2e-07 </td>
-   <td style="text-align:right;"> 1e-07 </td>
-   <td style="text-align:left;"> 71/7168/55799/3695/7040/112/3679/3688/3675/4000/776/783/784/1674/7124/5567/7139/7169/2778/3678/3655/3672/3908/6262/60/3696/1837/59284/7171/782/859/3680/93589/111/6645/4633/3693/109/153/8082/4624/59283/6546/6443/6547/27092/6641/107/7042/781/4634/115/3674/4625/3676/3691 </td>
-   <td style="text-align:right;"> 56 </td>
+   <td style="text-align:right;"> 0e+00 </td>
+   <td style="text-align:right;"> 0e+00 </td>
+   <td style="text-align:left;"> 71/7168/55799/3695/7040/112/3679/3688/3675/4000/776/783/784/1674/7124/5567/7139/7169/2778/3678/3655/3672/3908/6262/60/3696/1837/59284/7171/782/859/3680/93589/111/6645/4633/3693/109/153/8082/4624/59283/6546/6443/6547/27092/6641/107/7042/781/4634/102723407/115/3674/4625/3676/3691 </td>
+   <td style="text-align:right;"> 57 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> hsa04512 </td>
-   <td style="text-align:left;"> hsa04512 </td>
-   <td style="text-align:left;"> ECM-receptor interaction </td>
-   <td style="text-align:left;"> 50/2267 </td>
-   <td style="text-align:left;"> 89/8661 </td>
+   <td style="text-align:left;"> hsa04640 </td>
+   <td style="text-align:left;"> hsa04640 </td>
+   <td style="text-align:left;"> Hematopoietic cell lineage </td>
+   <td style="text-align:left;"> 54/2265 </td>
+   <td style="text-align:left;"> 99/8662 </td>
    <td style="text-align:right;"> 0 </td>
-   <td style="text-align:right;"> 2e-07 </td>
    <td style="text-align:right;"> 1e-07 </td>
-   <td style="text-align:left;"> 960/375790/6385/3695/1278/80144/1277/2335/3679/3688/3675/3911/3371/3912/22987/6382/3339/3678/3655/1291/3672/3908/3696/9899/1293/1311/3914/1292/2811/3680/7058/1287/3693/1284/7057/10319/3161/3918/7148/1280/6696/2814/7143/1285/341640/9900/3674/3676/3691/948 </td>
-   <td style="text-align:right;"> 50 </td>
+   <td style="text-align:right;"> 1e-07 </td>
+   <td style="text-align:left;"> 960/100133941/2208/3684/928/3675/1604/1437/4254/7124/3109/2322/3559/912/3569/921/1435/3678/3655/3553/3672/3563/3552/1438/925/2811/3581/930/913/290/910/3123/1378/916/1441/952/966/3575/926/3815/917/3127/924/3554/2814/915/7850/947/3108/102723407/3674/3676/948/927 </td>
+   <td style="text-align:right;"> 54 </td>
   </tr>
 </tbody>
 </table>
@@ -1258,10 +1394,10 @@ Supported organisms:</p>
 <li>Use de genes list from the GO gene set enrichment analysis</li>
 </ul>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb20"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>kegg_gsea <span class="ot">&lt;-</span> <span class="fu">gseKEGG</span>(<span class="at">geneList =</span> gsea_gene_list,</span>
-<span id="cb20-2"><a href="#cb20-2"></a>                     <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
-<span id="cb20-3"><a href="#cb20-3"></a>                     <span class="at">minGSSize =</span> <span class="dv">10</span>,</span>
-<span id="cb20-4"><a href="#cb20-4"></a>                     <span class="at">pvalueCutoff =</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>kegg_gsea <span class="ot">&lt;-</span> <span class="fu">gseKEGG</span>(<span class="at">geneList =</span> gsea_gene_list,</span>
+<span id="cb24-2"><a href="#cb24-2"></a>                     <span class="at">organism =</span> <span class="st">'hsa'</span>,</span>
+<span id="cb24-3"><a href="#cb24-3"></a>                     <span class="at">minGSSize =</span> <span class="dv">10</span>,</span>
+<span id="cb24-4"><a href="#cb24-4"></a>                     <span class="at">pvalueCutoff =</span> <span class="fl">0.05</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p><br></p>
 <div style="font-size: 50%;">
@@ -1291,12 +1427,12 @@ Supported organisms:</p>
    <td style="text-align:left;"> hsa04060 </td>
    <td style="text-align:left;"> Cytokine-cytokine receptor interaction </td>
    <td style="text-align:right;"> 108 </td>
-   <td style="text-align:right;"> -0.5141545 </td>
-   <td style="text-align:right;"> -1.806077 </td>
-   <td style="text-align:right;"> 0.0000006 </td>
-   <td style="text-align:right;"> 0.0001647 </td>
-   <td style="text-align:right;"> 0.0001434 </td>
-   <td style="text-align:right;"> 1049 </td>
+   <td style="text-align:right;"> -0.5141327 </td>
+   <td style="text-align:right;"> -1.785222 </td>
+   <td style="text-align:right;"> 6.00e-07 </td>
+   <td style="text-align:right;"> 0.0001763 </td>
+   <td style="text-align:right;"> 0.0001516 </td>
+   <td style="text-align:right;"> 1052 </td>
    <td style="text-align:left;"> tags=45%, list=21%, signal=37% </td>
    <td style="text-align:left;"> 6352/3554/29949/3604/83729/1441/130399/3586/56300/8794/1233/6368/8784/8600/4804/6357/355/4049/27302/94/7850/3596/3597/8200/1271/3576/1438/6362/7293/6364/64109/7292/6363/959/3569/8792/3976/3553/10148/6346/3557/3552/6369/1437/3624/3593/6376/6367/6361 </td>
   </tr>
@@ -1304,29 +1440,29 @@ Supported organisms:</p>
    <td style="text-align:left;"> hsa05202 </td>
    <td style="text-align:left;"> hsa05202 </td>
    <td style="text-align:left;"> Transcriptional misregulation in cancer </td>
-   <td style="text-align:right;"> 82 </td>
-   <td style="text-align:right;"> -0.5233763 </td>
-   <td style="text-align:right;"> -1.805120 </td>
-   <td style="text-align:right;"> 0.0000032 </td>
-   <td style="text-align:right;"> 0.0004479 </td>
-   <td style="text-align:right;"> 0.0003901 </td>
-   <td style="text-align:right;"> 914 </td>
-   <td style="text-align:left;"> tags=44%, list=19%, signal=36% </td>
-   <td style="text-align:left;"> 10912/3002/942/598/7185/1848/64919/5154/4804/5468/85414/4914/7850/3195/4086/3728/8091/7704/5327/3576/5328/8013/3398/51513/3206/51804/5747/860/4211/3569/3207/5087/1437/2115/6495/5077 </td>
+   <td style="text-align:right;"> 83 </td>
+   <td style="text-align:right;"> -0.5285037 </td>
+   <td style="text-align:right;"> -1.799363 </td>
+   <td style="text-align:right;"> 4.30e-06 </td>
+   <td style="text-align:right;"> 0.0006018 </td>
+   <td style="text-align:right;"> 0.0005172 </td>
+   <td style="text-align:right;"> 917 </td>
+   <td style="text-align:left;"> tags=45%, list=19%, signal=37% </td>
+   <td style="text-align:left;"> 10912/3002/942/598/7185/1848/64919/5154/4804/5468/85414/4914/7850/3195/4086/3728/102723407/8091/7704/5327/3576/5328/8013/3398/51513/3206/51804/5747/860/4211/3569/3207/5087/1437/2115/6495/5077 </td>
   </tr>
   <tr>
-   <td style="text-align:left;"> hsa03420 </td>
-   <td style="text-align:left;"> hsa03420 </td>
-   <td style="text-align:left;"> Nucleotide excision repair </td>
-   <td style="text-align:right;"> 11 </td>
-   <td style="text-align:right;"> 0.6577635 </td>
-   <td style="text-align:right;"> 2.449852 </td>
-   <td style="text-align:right;"> 0.0002891 </td>
-   <td style="text-align:right;"> 0.0267912 </td>
-   <td style="text-align:right;"> 0.0233319 </td>
-   <td style="text-align:right;"> 1292 </td>
-   <td style="text-align:left;"> tags=91%, list=26%, signal=67% </td>
-   <td style="text-align:left;"> 100533467/56655/7507/5441/3978/5111/7508/2074/54107/5983 </td>
+   <td style="text-align:left;"> hsa03008 </td>
+   <td style="text-align:left;"> hsa03008 </td>
+   <td style="text-align:left;"> Ribosome biogenesis in eukaryotes </td>
+   <td style="text-align:right;"> 15 </td>
+   <td style="text-align:right;"> 0.5648480 </td>
+   <td style="text-align:right;"> 2.380757 </td>
+   <td style="text-align:right;"> 2.64e-04 </td>
+   <td style="text-align:right;"> 0.0222782 </td>
+   <td style="text-align:right;"> 0.0191487 </td>
+   <td style="text-align:right;"> 1479 </td>
+   <td style="text-align:left;"> tags=87%, list=30%, signal=61% </td>
+   <td style="text-align:left;"> 10799/54913/54433/51077/27341/55341/1736/10885/55916/83732/138716/10528/65083 </td>
   </tr>
 </tbody>
 </table>
@@ -1340,17 +1476,17 @@ Supported organisms:</p>
 <p>Save the pathway analysis to file</p>
 <p>Over representation analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb21"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb21-1"><a href="#cb21-1"></a>kegg_ora <span class="sc">%&gt;%</span></span>
-<span id="cb21-2"><a href="#cb21-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb21-3"><a href="#cb21-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"ora_pathway.tsv"</span>),</span>
-<span id="cb21-4"><a href="#cb21-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb25"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb25-1"><a href="#cb25-1"></a>kegg_ora <span class="sc">%&gt;%</span></span>
+<span id="cb25-2"><a href="#cb25-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb25-3"><a href="#cb25-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"ora_pathway.tsv"</span>),</span>
+<span id="cb25-4"><a href="#cb25-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Gene set enrichment analysis</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb22"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1"></a>kegg_gsea <span class="sc">%&gt;%</span></span>
-<span id="cb22-2"><a href="#cb22-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb22-3"><a href="#cb22-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"gsea_pathway.tsv"</span>),</span>
-<span id="cb22-4"><a href="#cb22-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb26"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb26-1"><a href="#cb26-1"></a>kegg_gsea <span class="sc">%&gt;%</span></span>
+<span id="cb26-2"><a href="#cb26-2"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb26-3"><a href="#cb26-3"></a>  <span class="fu">write_delim</span>(<span class="at">file =</span> <span class="fu">file.path</span>(results_directory, <span class="st">"gsea_pathway.tsv"</span>),</span>
+<span id="cb26-4"><a href="#cb26-4"></a>              <span class="at">delim =</span> <span class="st">"</span><span class="sc">\t</span><span class="st">"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pathway-analysis-visualisation" class="slide level2 smaller">
@@ -1374,32 +1510,50 @@ Supported organisms:</p>
 <h2>Pathway Analysis Visualisation</h2>
 <p>Create a function to retrieve the KEG pathways</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb23"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>kegg_pathview <span class="ot">&lt;-</span> <span class="cf">function</span>(kegg_pathway_id){</span>
-<span id="cb23-2"><a href="#cb23-2"></a>  <span class="fu">pathview</span>(<span class="at">gene.data =</span> gsea_gene_list, <span class="co"># List of DE gene entrez ids and log fold changes</span></span>
-<span id="cb23-3"><a href="#cb23-3"></a>        <span class="at">pathway.id =</span> kegg_pathway_id, <span class="co"># KEGG pathway id to download and annotate</span></span>
-<span id="cb23-4"><a href="#cb23-4"></a>        <span class="at">species =</span> <span class="st">"hsa"</span>, <span class="co"># Organism KEGG id</span></span>
-<span id="cb23-5"><a href="#cb23-5"></a>        <span class="at">gene.idtype =</span> <span class="st">"KEGG"</span>, </span>
-<span id="cb23-6"><a href="#cb23-6"></a>        <span class="at">kegg.native =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb23-7"><a href="#cb23-7"></a>}</span>
-<span id="cb23-8"><a href="#cb23-8"></a></span>
-<span id="cb23-9"><a href="#cb23-9"></a>kegg_gsea_list <span class="ot">&lt;-</span> kegg_gsea <span class="sc">%&gt;%</span></span>
-<span id="cb23-10"><a href="#cb23-10"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb23-11"><a href="#cb23-11"></a>  <span class="fu">pull</span>(ID) </span>
-<span id="cb23-12"><a href="#cb23-12"></a><span class="fu">lapply</span>(kegg_gsea_list, kegg_pathview)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb27"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1"></a>kegg_pathview <span class="ot">&lt;-</span> <span class="cf">function</span>(kegg_pathway_id){</span>
+<span id="cb27-2"><a href="#cb27-2"></a>  <span class="fu">pathview</span>(<span class="at">gene.data =</span> kegg_gsea, <span class="co"># List of DE gene entrez ids and log fold changes</span></span>
+<span id="cb27-3"><a href="#cb27-3"></a>        <span class="at">pathway.id =</span> kegg_pathway_id, <span class="co"># KEGG pathway id to download and annotate</span></span>
+<span id="cb27-4"><a href="#cb27-4"></a>        <span class="at">species =</span> <span class="st">"hsa"</span>, <span class="co"># Organism KEGG id</span></span>
+<span id="cb27-5"><a href="#cb27-5"></a>        <span class="at">gene.idtype =</span> <span class="st">"KEGG"</span>, </span>
+<span id="cb27-6"><a href="#cb27-6"></a>        <span class="at">kegg.native =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb27-7"><a href="#cb27-7"></a>}</span>
+<span id="cb27-8"><a href="#cb27-8"></a></span>
+<span id="cb27-9"><a href="#cb27-9"></a>kegg_gsea_list <span class="ot">&lt;-</span> kegg_gsea <span class="sc">%&gt;%</span></span>
+<span id="cb27-10"><a href="#cb27-10"></a>  <span class="fu">as.data.frame</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb27-11"><a href="#cb27-11"></a>  <span class="fu">pull</span>(ID) </span>
+<span id="cb27-12"><a href="#cb27-12"></a><span class="fu">lapply</span>(kegg_gsea_list, kegg_pathview)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <p>Tidy up the pathway files</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb24"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a>results.files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"pathview.png"</span>) <span class="sc">%&gt;%</span> <span class="co"># list all pathview files</span></span>
-<span id="cb24-2"><a href="#cb24-2"></a>  <span class="fu">file.copy</span>(results_directory) <span class="co"># Copy pathway files to results directory</span></span>
-<span id="cb24-3"><a href="#cb24-3"></a><span class="co"># Delete results files</span></span>
-<span id="cb24-4"><a href="#cb24-4"></a>remove_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"hsa"</span>) <span class="sc">%&gt;%</span> <span class="co"># List all files dowloaded from KEGG</span></span>
-<span id="cb24-5"><a href="#cb24-5"></a>  <span class="fu">file.remove</span>() <span class="co"># Delete the files</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb28"><pre class="sourceCode numberSource r number-lines code-with-copy"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>results.files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"pathview.png"</span>) <span class="sc">%&gt;%</span> <span class="co"># list all pathview files</span></span>
+<span id="cb28-2"><a href="#cb28-2"></a>  <span class="fu">file.copy</span>(results_directory) <span class="co"># Copy pathway files to results directory</span></span>
+<span id="cb28-3"><a href="#cb28-3"></a><span class="co"># Delete results files</span></span>
+<span id="cb28-4"><a href="#cb28-4"></a>remove_files <span class="ot">&lt;-</span> <span class="fu">list.files</span>(<span class="at">path =</span> <span class="st">"."</span>, <span class="at">pattern =</span> <span class="st">"hsa"</span>) <span class="sc">%&gt;%</span> <span class="co"># List all files dowloaded from KEGG</span></span>
+<span id="cb28-5"><a href="#cb28-5"></a>  <span class="fu">file.remove</span>() <span class="co"># Delete the files</span></span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 </section>
 <section id="pathway-analysis-visualisation-2" class="slide level2 smaller">
 <h2>Pathway Analysis Visualisation</h2>
 
-<img data-src="ClusterProfiler/hsa05202.pathview.png" style="width:100.0%" class="r-stretch"><div class="footer footer-default">
+<img data-src="ClusterProfiler/hsa05202.pathview.png" style="width:100.0%" class="r-stretch"></section>
+<section id="download-course-material" class="slide level2">
+<h2>Download Course Material</h2>
+<p>https://github.com/GrahamHamilton/FunctionalAnalysisTeaching</p>
+<div class="r-stack">
+<p><img data-src="images/github.png" class="fragment" height="500"></p>
+<p><img data-src="images/github_download.png" class="fragment" height="300"></p>
+</div>
+</section>
+<section id="download-course-material-1" class="slide level2">
+<h2>Download Course Material</h2>
+<ul>
+<li>Select Download ZIP</li>
+<li>Unzip the downloaded file</li>
+<li>Move the folder to a suitable place on computer</li>
+<li>Open RStudio and, using the files pane, navigate to the FunctionalAnalysisTeaching-main folder</li>
+<li>Double click on the FunctionalAnalysis.Rproj</li>
+</ul>
+<div class="footer footer-default">
 
 </div>
 </section>

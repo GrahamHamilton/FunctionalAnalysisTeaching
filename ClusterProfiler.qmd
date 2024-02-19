@@ -126,9 +126,9 @@ qvalueCutoff <- 0.1 # Adjusted P value
 foldchange <- 1 # Fold change, usually fold change is log2
 ```
 
-## Load Previous Session Results {.smaller}
+## Load Results {.smaller}
 
-Read in the results file from Session 4
+Read in the results file from DESeq2 Analysis
 
 ```{r}
 #| echo: true
@@ -136,6 +136,103 @@ Read in the results file from Session 4
 de_results <- read_delim("./data/Treatment_vs_Control_results.tsv", 
                          delim = "\t")
 
+```
+
+<br>
+
+::: {style="font-size: 80%;"}
+```{r}
+#| echo: false
+#| eval: true
+de_results %>%
+  head(n=3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+<br>
+
+**baseMean** - mean of normalized counts for all samples\
+**log2FoldChang**e - log2 fold change (MAP): condition treated vs untreated\
+**lfcSE** - standard error: condition treated vs untreated\
+**stat** - Wald statistic: condition treated vs untreated\
+**pvalue** - Wald test p-value: condition treated vs untreated\
+**padj** - BH adjusted p-values
+
+## Annotations {.smaller}
+
+The DESeq2 results file contains very little information about the genes.\
+Annotations can be added from the GFF3 file or form the Biomart data base.\
+Using the R package biomaRt we can access the data sets <br>
+
+```{r}
+#| echo: false
+#| eval: true
+ensembl <- useEnsembl(biomart = "genes")
+ biomart_datasets <- listDatasets(ensembl)
+```
+
+::: {style="font-size: 50%;"}
+```{r}
+#| echo: false
+#| eval: true
+biomart_datasets %>%
+  head(n=5) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+<br> There are **`r nrow(biomart_datasets)`** organism datasets in Biomart.
+
+## Annotations {.smaller}
+
+Here we get annotations from the Ensembl human database at Biomart
+
+```{r Annotations}
+#| echo: true
+#| eval: true
+
+database <- "hsapiens_gene_ensembl"
+mart <- "genes"
+filt <- "ensembl_gene_id"
+
+ensembl <- useEnsembl(biomart = mart, dataset = database)
+
+att <- c("ensembl_gene_id","external_gene_name","chromosome_name","start_position","end_position","gene_biotype","entrezgene_id")
+
+annotations <- getBM(attributes=att,filter=filt,values=de_results$ensembl_gene_id,mart=ensembl) %>% 
+  distinct(ensembl_gene_id, .keep_all = TRUE)
+```
+
+## Annotations
+
+<br>
+
+::: {style="font-size: 40%;"}
+```{r}
+#| echo: false
+#| eval: true
+annotations %>%
+  head(n=3) %>%
+  kbl() %>%
+  kable_styling("condensed")
+```
+:::
+
+## Add Annotations
+
+The annotations can be merged with our results file
+
+```{r}
+#| echo: true
+#| eval: true
+#| tidy.opts: { width.cutoff: 60 }
+de_results <- de_results %>%
+  left_join(annotations, by = "ensembl_gene_id")%>% # merge annotations by ensembl gene id
+  arrange(padj) %>% # Sort the dataframe by the p adjusted value ascending
+  replace_na(list(log2FoldChange = 0.001))
 ```
 
 <br>
@@ -164,7 +261,7 @@ dir.create(results_directory, showWarnings = FALSE)
 
 ## Filter {.smaller}
 
-Filter the results table for genes that have a p adjusted value of 0.1 and a log fold change of 1.
+Filter the results table for genes that have a p adjusted value of 0.1 and a log 2 fold change of 1.
 
 **NOTE:** The use of the absolute value for the log2 fold change.
 
@@ -214,18 +311,26 @@ There are **`r nrow(filtered_de_results)`** genes remaining after filtering.
 Example - 57 genes were differentially expressed out of a total of 17,980. Among the differentially expressed genes, 28 are annotated to a gene set
 
 ```{r}
+#| echo: true
+#| eval: true
+d <- data.frame(genes_not_differentially_expressed=c(2613, 15310), genes_differentially_expressed=c(28, 29))
+row.names(d) <- c("In_GO_term", "Not_in_GO_term")
+```
+
+<br>
+
+```{r}
 #| echo: false
 #| eval: true
-d <- data.frame(gene.not.interest=c(2613, 15310), gene.in.interest=c(28, 29))
-row.names(d) <- c("In_category", "not_in_category")
-
 d %>%
   kbl() %>%
   kable_styling("condensed")
 ```
 
+<br>
+
 ```{r}
-#| echo: false
+#| echo: true
 #| eval: true
 f_test <- fisher.test(d)
 ```
@@ -281,6 +386,7 @@ Over representation analysis
 ```{r}
 #| echo: true
 #| eval: true
+#| tidy.opts: { width.cutoff: 60 }
 go_ora <- enrichGO(gene = de_genes,
                    OrgDb = org.Hs.eg.db,
                    ont = "CC", # Can choose "BP","CC", "MF" or "ALL"
@@ -333,6 +439,7 @@ Gene set enrichment analysis
 ```{r}
 #| echo: true
 #| eval: true
+#| tidy.opts: { width.cutoff: 60 }
 go_gsea <- gseGO(gene = gsea_gene_list,
                  OrgDb = org.Hs.eg.db,
                  ont = "CC", # Can choose BP,CC, MF or ALL
@@ -481,7 +588,7 @@ Search using search_kegg_organism() command:
 ```{r}
 #| echo: true
 #| eval: true
-search_kegg_organism("Mus musculus", by='scientific_name') %>% # Can also search using kegg_code or common_name
+search_kegg_organism("Mus musculus", by="scientific_name") %>% # Can also search using kegg_code or common_name
   kbl() %>%
   kable_styling("condensed")
 ```
@@ -598,7 +705,7 @@ Create a function to retrieve the KEG pathways
 #| eval: true
 #| output: false
 kegg_pathview <- function(kegg_pathway_id){
-  pathview(gene.data = gsea_gene_list, # List of DE gene entrez ids and log fold changes
+  pathview(gene.data = kegg_gsea, # List of DE gene entrez ids and log fold changes
         pathway.id = kegg_pathway_id, # KEGG pathway id to download and annotate
         species = "hsa", # Organism KEGG id
         gene.idtype = "KEGG", 
@@ -626,3 +733,21 @@ remove_files <- list.files(path = ".", pattern = "hsa") %>% # List all files dow
 ## Pathway Analysis Visualisation {.smaller}
 
 ![](ClusterProfiler/hsa05202.pathview.png){width="100%"}
+
+## Download Course Material
+
+https://github.com/GrahamHamilton/FunctionalAnalysisTeaching
+
+::: r-stack
+![](images/github.png){.fragment height="500"}
+
+![](images/github_download.png){.fragment height="300"}
+:::
+
+## Download Course Material
+
+-   Select Download ZIP
+-   Unzip the downloaded file
+-   Move the folder to a suitable place on computer
+-   Open RStudio and, using the files pane, navigate to the FunctionalAnalysisTeaching-main folder
+-   Double click on the FunctionalAnalysis.Rproj
