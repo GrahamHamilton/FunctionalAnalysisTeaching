@@ -1,11 +1,8 @@
 ---
 title: "Functional Analysis"
 author: "Graham Hamilton"
-format:
-  revealjs:
-    slide-number: c/t
-    show-slide-number: all
-editor: source
+format: pptx
+prefer-html: true
 ---
 
 ## Overview
