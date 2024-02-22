@@ -203,7 +203,7 @@ Using the function function to retrieve the KEG pathways.
 Get a list of KEGG path way ids, kegg_pathway_ids_list, from the kegg_gsea results and pass them thpo the function
 
 ```{r}
-# Pathway visulaisation function
+# Pathway visualisation function
 kegg_pathview <- function(kegg_pathway_id){ 
   pathview(gene.data = gsea_gene_list, # Named list of fold changes
         pathway.id = kegg_pathway_id, # KEGG pathway id
